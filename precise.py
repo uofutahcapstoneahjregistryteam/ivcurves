@@ -6,7 +6,7 @@ import itertools
 import json
 import csv
 import datetime
-
+import max_power
 
 def diff_lhs_rhs(v, i, il, io, rs, rsh, n, vth, ns):
     r"""
@@ -109,8 +109,8 @@ def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
 
     Returns
     -------
-    (vv, prec_i) : tuple of numpy arrays
-        `vv` is a numpy array of float64 and `prec_i` is a numpy array of
+    (vv, precise_i) : tuple of numpy arrays
+        `vv` is a numpy array of float64 and `precise_i` is a numpy array of
         mpmath floats. Each array has `num_pts` entries.
 
     Notes
@@ -118,34 +118,34 @@ def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
     Uses pvlib.pvsystem.singlediode to generate solution pairs, then uses
     mpmath's findroot to sharpen the precision of the solutions if necessary.
     """
-    res = pvlib.pvsystem.singlediode(il, io, rs, rsh, n*vth*ns, num_pts)
-    vv = res['v']
-    ii = res['i']
-    # initialize 'empty' array for new, more precise i's
-    prec_i = np.array([0 for _ in range(ii.shape[0])], dtype=mp.mpf) 
+    # convert mpf to np.float64
+    parameters_npfloat64 = map(lambda x: np.array(x, dtype=np.float64), [il, io, rs, rsh, n*vth*ns])
+    res = pvlib.pvsystem.singlediode(*parameters_npfloat64, ivcurve_pnts=num_pts)
 
-    assert len(vv) == len(ii)
-    for idx in range(len(vv)):
-        i = mp.mpf(str(ii[idx]))
+    # convert np.float64 to mpf
+    vv = np.fromiter(map(mp.mpmathify, res['v']), dtype=mp.mpf)
+    ii = np.fromiter(map(mp.mpmathify, res['i']), dtype=mp.mpf)
+
+    # allocate array for new, more precise i's
+    precise_i = np.zeros(ii.shape[0], dtype=mp.mpf)
+
+    for idx, (v, i) in enumerate(zip(vv, ii, strict=True)):
         # check if i val already precise enough
-        if abs(diff_lhs_rhs(vv[idx], i, il, io, rs, rsh, n, vth, ns)) < atol: 
+        i_precise_enough = lambda c: abs(diff_lhs_rhs(v, c, il, io, rs, rsh, n, vth, ns)) < atol
+        if i_precise_enough(i):
             new_i = i
-
         else:
             # findroot takes the function whose roots we want to find, a good
             # guess for where the root is, and a tolerance
             # default solver uses secant method
-            new_i = mp.findroot(lambda x: diff_lhs_rhs(vv[idx], x, il, io, rs, rsh, n, vth, ns), i, tol=atol**2)
+            new_i = mp.findroot(lambda x: diff_lhs_rhs(v, x, il, io, rs, rsh, n, vth, ns), i, tol=atol**2)
+            assert i_precise_enough(new_i), f'Index: {idx}'
             # setting tol=atol**2 because findroot checks func(zero)**2 < tol
 
-        # check that mp.findroot did what we wanted 
-        assert abs(diff_lhs_rhs(vv[idx], new_i, il, io, rs, rsh, n, vth, ns)) < atol
-
         # updating array of i's
-        prec_i[idx] = new_i
+        precise_i[idx] = new_i
 
-    # vv is a np.array of float64 and prec_i is a np.array of mp.mpf 
-    return vv, prec_i
+    return vv, precise_i
 
 
 def plotter(il, io, rs, rsh, n, vth, ns, atol, num_pts, case_title):
@@ -175,8 +175,11 @@ def read_case_parameters(filename):
                              'cells_in_series']
         rows = []
         for row in reader:
-            rows.append([int(row['Index'])]
-                        + [float(row[col]) for col in parameter_columns])
+            rows.append(
+                [int(row['Index'])]
+                + [mp.mpmathify(row[col], strings=True)
+                    for col in parameter_columns]
+            )
         return rows
 
 
@@ -186,7 +189,7 @@ def write_case_tests(case_filename, case_parameter_sets, vth, temp_cell, atol,
                        'IV Curves': []}
     for test_idx, il, io, rs, rsh, n, ns in case_parameter_sets:
         vv, ii = get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts)
-        vv = np.fromiter(map(mp.mpmathify, vv), dtype=mp.mpf)
+
         v_oc = vv.max()
         i_sc = ii.max()
 
@@ -226,10 +229,10 @@ def write_case_tests(case_filename, case_parameter_sets, vth, temp_cell, atol,
 if __name__ == "__main__":
     mp.dps = 40 # set precision, 16*2 rounded up
     num_pts = 100
-    atol = 1e-16
+    atol = mp.mpmathify(1e-16)
 
     # Boltzmann's const (J/K), electron charge (C), temp (K) 
-    k, q, temp_cell = [1.380649e-23, 1.60217663e-19, 298.15]
+    k, q, temp_cell = map(mp.mpmathify, [1.380649e-23, 1.60217663e-19, 298.15])
     vth = (k * temp_cell) / q
 
     case_number = 1
