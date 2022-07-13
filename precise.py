@@ -145,6 +145,14 @@ def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
         # updating array of i's
         precise_i[idx] = new_i
 
+    # find precise v_oc and set as last coordinate
+    precise_i[-1] = mp.mpmathify(0)
+    vv[-1] = max_power.lambert_v_from_i(precise_i[-1], il, io, rs, rsh, n, vth,
+                                        ns)
+
+    assert vv[0] == 0, f'Must be zero: vv[0] = {vv[0]}'
+    assert precise_i[-1] == 0, f'Must be zero: precise_i[-1] = {precise_i[-1]}'
+
     return vv, precise_i
 
 
@@ -192,14 +200,8 @@ def write_case_tests(case_filename, case_parameter_sets, vth, temp_cell, atol,
 
         v_oc = vv.max()
         i_sc = ii.max()
-
-        # find v_mp, i_mp, where p_mp = v_mp * i_mp is maximized
-        v_mp, i_mp = vv[0], ii[0]
-        p_mp = v_mp * i_mp
-        for v, c in zip(vv, ii):
-            if p_mp < v * c:
-                v_mp, i_mp = v, c
-                p_mp = v * c
+        v_mp, i_mp, p_mp = max_power.max_power_pt_finder(il, io, rs, rsh, n,
+                                                         vth, ns, atol)
 
         precision = 16
         # find max digits to the left of decimal
