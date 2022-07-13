@@ -2,7 +2,7 @@ import pvlib
 import numpy as np
 import matplotlib.pyplot as plt
 from mpmath import mp
-from itertools import product
+import itertools
 import json
 import csv
 import datetime
@@ -185,27 +185,37 @@ def write_case_tests(case_filename, case_parameter_sets, vth, temp_cell, atol,
     case_test_suite = {'Manufacturer': '', 'Sandia ID': '', 'Material': '',
                        'IV Curves': []}
     for test_idx, il, io, rs, rsh, n, ns in case_parameter_sets:
-        voltages, currents = get_precise_i(il, io, rs, rsh, n, vth, ns, atol,
-                                           num_pts)
-        nstr16 = lambda x: mp.nstr(x, n=16)
-        voltages_str_list = [nstr16(x) for x in voltages]
-        currents_str_list = [nstr16(x) for x in currents]
+        vv, ii = get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts)
+        vv = np.fromiter(map(mp.mpmathify, vv), dtype=mp.mpf)
+        v_oc = vv.max()
+        i_sc = ii.max()
 
         # find v_mp, i_mp, where p_mp = v_mp * i_mp is maximized
-        # should calculate precisely
-        v_mp, i_mp = voltages[0], currents[0]
+        v_mp, i_mp = vv[0], ii[0]
         p_mp = v_mp * i_mp
-        for v, c in zip(voltages, currents):
+        for v, c in zip(vv, ii):
             if p_mp < v * c:
                 v_mp, i_mp = v, c
                 p_mp = v * c
 
+        precision = 16
+        # find max digits to the left of decimal
+        all_mpf = itertools.chain(vv, ii, [v_oc, i_sc, v_mp, i_mp, p_mp])
+        # force mpf to string in decimal format, no exponent
+        mpf_to_str = lambda x: mp.nstr(x, n=precision*2, min_fixed=-mp.inf,
+                                       max_fixed=mp.inf)
+        ldigits = max(mpf_to_str(abs(num)).find('.') for num in all_mpf)
+
+        nstr16 = lambda x: mp.nstr(x, n=ldigits+precision)
+        vv_str_list = [nstr16(x) for x in vv]
+        ii_str_list = [nstr16(x) for x in ii]
+
         case_test_suite['IV Curves'].append({
-            'Index': test_idx, 'Voltages': voltages_str_list,
-            'Currents': currents_str_list, 'v_oc': nstr16(voltages.max()),
-            'i_sc': nstr16(currents.max()), 'v_mp': nstr16(v_mp),
+            'Index': test_idx, 'Voltages': vv_str_list,
+            'Currents': ii_str_list, 'v_oc': nstr16(v_oc),
+            'i_sc': nstr16(i_sc), 'v_mp': nstr16(v_mp),
             'i_mp': nstr16(i_mp), 'p_mp': nstr16(p_mp),
-            'Temperature': str(temp_cell), 'Irradiance': None,
+            'Temperature': mp.nstr(temp_cell, n=5), 'Irradiance': None,
             'Sweep direction': None, 'Datetime': None
         })
 
