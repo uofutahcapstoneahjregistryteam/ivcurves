@@ -110,8 +110,8 @@ def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
     Returns
     -------
     (vv, precise_i) : tuple of numpy arrays
-        `vv` is a numpy array of float64 and `precise_i` is a numpy array of
-        mpmath floats. Each array has `num_pts` entries.
+        `vv` and `precise_i` are numpy arrays of mpmath floats of
+        length `num_pts`.
 
     Notes
     -----
