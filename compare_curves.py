@@ -1,9 +1,11 @@
 import pvlib
 import matplotlib.pyplot as plt
+import json
 
 # from ivcurves repo
 import utils
 from utils import mp, diff_lhs_rhs
+import solution
 from max_power import lambert_i_from_v
 from precise import get_precise_i
 
@@ -564,25 +566,36 @@ def iv_plotter(iv_known, iv_fitted, vth, num_pts, atol, pts=[], plot_lines=True)
     return plot
 
 
+def get_case_json(case_filename):
+    with open(f'{case_filename}.json', 'r') as file:
+        return json.load(file)
+
 
 ######## 
 # MAIN #
 ######## 
 
 if __name__ == "__main__":
+    constants = utils.constants()
+    vth, atol = constants['vth'], constants['atol']
     num_compare_pts = 10
     num_total_pts = 200
 
-    # intersecting curves example
-    iv_known = list(map(mp.mpmathify, [6.0, 3.8500023e-06, 1.6816000000000002, 8832.800000000005, 1.4200000000000004, 72]))
-    iv_fitted = list(map(mp.mpmathify, [4.2, 6.500087e-07, 0.9453, 17881.40000000001, 1.6300000000000006, 72]))
+    scores = {}
+    for case_filename in utils.case_filenames():
+        scores[case_filename] = {}
+        case_filepath = f'{utils.TESTS_DIR}/{case_filename}'
+        case_json = get_case_json(case_filepath)
+        case_test_json = {int(test['Index']): test for test in case_json['IV Curves']}
+        for test_idx, *iv_known in utils.read_case_parameters(case_filepath):
+            iv_fitted = list(map(mp.mpmathify, solution.fit_parameters(case_test_json[test_idx])))
+            scores[case_filename][test_idx] = total_score(iv_known, iv_fitted, vth, num_compare_pts, atol)
 
-    constants = utils.constants()
-    vth, atol = constants['vth'], constants['atol']
+    for case_filename, case_scores in scores.items():
+        for test_idx, score in case_scores.items():
+            print(f'Case: {case_filename}, Index: {test_idx}, Score: {score}')
 
-    print("Total score:", total_score(iv_known, iv_fitted, vth, num_compare_pts, atol))
-
-    fit_xs, fit_ys = get_curve(iv_fitted, vth, num_compare_pts, atol)
-    plot = iv_plotter(iv_known, iv_fitted, vth, num_total_pts, atol, pts=list(zip(fit_xs, fit_ys)), plot_lines=True)
-    plt.show()
+    # fit_xs, fit_ys = get_curve(iv_fitted, vth, num_compare_pts, atol)
+    # plot = iv_plotter(iv_known, iv_fitted, vth, num_total_pts, atol, pts=list(zip(fit_xs, fit_ys)), plot_lines=True)
+    # plt.show()
 

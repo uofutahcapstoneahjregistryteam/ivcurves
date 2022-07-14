@@ -1,5 +1,9 @@
+import os
 import csv
 from mpmath import mp
+
+
+TESTS_DIR = 'tests'
 
 
 def set_globals():
@@ -32,6 +36,16 @@ def read_case_parameters(filename):
                     for col in parameter_columns]
             )
         return rows
+
+
+def case_filenames():
+    res = set()
+    for _, _, filenames in os.walk(TESTS_DIR, topdown=True):
+        for filename in filenames:
+            res.add(filename.split(".")[0])
+    res = list(res)
+    res.sort()
+    return res
 
 
 def diff_lhs_rhs(v, i, il, io, rs, rsh, n, vth, ns):
