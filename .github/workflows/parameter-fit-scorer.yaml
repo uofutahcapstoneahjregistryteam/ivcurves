@@ -15,6 +15,14 @@ jobs:
           python-version: '3.10'
       - name: Install requirements
         run: pip3 install -r requirements.txt
-      - name: Run scorer
-        run: python3 compare_curves.py
+      - name: Run scorer and write results to ./pr/scores.json
+        run: |
+          mkdir -p ./pr
+          python3 compare_curves.py
+      - name: Save results
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: scores.json
+          path: pr/
 
