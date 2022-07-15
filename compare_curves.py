@@ -590,7 +590,7 @@ if __name__ == "__main__":
         case_test_json = {int(test['Index']): test for test in case_json['IV Curves']}
         for test_idx, *iv_known in utils.read_case_parameters(case_filepath):
             iv_fitted = list(map(mp.mpmathify, solution.fit_parameters(case_test_json[test_idx])))
-            scores[case_filename][test_idx] = total_score(iv_known, iv_fitted, vth, num_compare_pts, atol)
+            scores[case_filename][test_idx] = mp.nstr(total_score(iv_known, iv_fitted, vth, num_compare_pts, atol))
 
     for case_filename, case_scores in scores.items():
         for test_idx, score in case_scores.items():
