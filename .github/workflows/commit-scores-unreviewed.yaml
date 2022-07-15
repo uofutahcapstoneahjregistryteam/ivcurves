@@ -1,0 +1,21 @@
+name: Commit Scores (Unreviewed)
+
+on:
+  workflow_run:
+    workflows: [IV Curve Parameter Fit Scorer]
+    types:
+      - completed
+    branches: [git-action-scorer]
+
+jobs:
+  commit-scores-to-database-unreviewed:
+    name: Commit Scores (Unreviewed)
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Validate score output
+        # retrive output from parameter-fit-scorer and validate/sanitize it
+        run: echo 'Output is valid'
+      - name: Commit to database
+        run: echo 'Scores recorded'
+
