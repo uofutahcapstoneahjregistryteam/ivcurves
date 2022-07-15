@@ -20,7 +20,8 @@ jobs:
           run_id: ${{ github.event.workflow_run.id }};
       - name: Validate score output
         # retrive output from parameter-fit-scorer and validate/sanitize it
-        run: ls
+        run: ls -R
       - name: Commit to database
+        if: ${{ github.repository_owner == 'cwhanse' }}
         run: echo 'Scores recorded'
 
