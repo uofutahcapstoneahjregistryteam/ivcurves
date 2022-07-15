@@ -2,7 +2,7 @@ name: Commit Scores (Unreviewed)
 
 on:
   workflow_run:
-    workflows: ['IV Curve Parameter Fit Scorer']
+    workflows: [IV Curve Parameter Fit Scorer]
     types:
       - completed
 
