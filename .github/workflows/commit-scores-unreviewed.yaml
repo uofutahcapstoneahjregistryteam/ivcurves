@@ -13,9 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
+      - name: Download scores from scorer workflow
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: parameter-fit-scorer.yaml
+          run_id: ${{ github.event.workflow_run.id }};
       - name: Validate score output
         # retrive output from parameter-fit-scorer and validate/sanitize it
-        run: echo 'Output is valid'
+        run: ls
       - name: Commit to database
         run: echo 'Scores recorded'
 

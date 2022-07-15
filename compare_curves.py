@@ -1,6 +1,7 @@
 import pvlib
 import matplotlib.pyplot as plt
 import json
+import argparse
 
 # from ivcurves repo
 import utils
@@ -594,6 +595,9 @@ if __name__ == "__main__":
     for case_filename, case_scores in scores.items():
         for test_idx, score in case_scores.items():
             print(f'Case: {case_filename}, Index: {test_idx}, Score: {score}')
+
+    with open('./pr/scores.json', 'w') as file:
+        json.dump(scores, file, indent=2)
 
     # fit_xs, fit_ys = get_curve(iv_fitted, vth, num_compare_pts, atol)
     # plot = iv_plotter(iv_known, iv_fitted, vth, num_total_pts, atol, pts=list(zip(fit_xs, fit_ys)), plot_lines=True)
