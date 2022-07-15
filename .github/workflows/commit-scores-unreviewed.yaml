@@ -5,6 +5,7 @@ on:
     workflows: [IV Curve Parameter Fit Scorer]
     types:
       - completed
+    branches: [git-action-scorer]
 
 jobs:
   commit-scores-to-database-unreviewed:
