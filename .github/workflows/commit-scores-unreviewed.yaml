@@ -16,7 +16,8 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: parameter-fit-scorer.yaml
-          run_id: ${{ github.event.workflow_run.id }};
+          repo: ${{ github.event.workflow_run.repository }}
+          run_id: ${{ github.event.workflow_run.id }}
       - name: Validate score output
         # retrive output from parameter-fit-scorer and validate/sanitize it
         run: ls -R
