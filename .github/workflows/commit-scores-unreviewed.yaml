@@ -2,7 +2,7 @@ name: Commit Scores (Unreviewed)
 
 on:
   workflow_run:
-    workflows: [parameter-fit-scorer]
+    workflows: [Score submission]
     types:
       - completed
 
