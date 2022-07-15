@@ -40,7 +40,7 @@ def read_case_parameters(filename):
 
 def case_filenames():
     res = set()
-    for _, _, filenames in os.walk(TESTS_DIR, topdown=True):
+    for _, _, filenames in os.walk(TESTS_DIR):
         for filename in filenames:
             res.add(filename.split(".")[0])
     res = list(res)
