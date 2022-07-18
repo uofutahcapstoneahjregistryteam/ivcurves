@@ -17,5 +17,7 @@ jobs:
           workflow: parameter-fit-scorer.yaml
           run_id: ${{ github.event.workflow_run.id }}
       - name: Validate scores.json
-        run: ls -R
+        run: |
+          head scores.json
+          head scores.json/scores.json
 
