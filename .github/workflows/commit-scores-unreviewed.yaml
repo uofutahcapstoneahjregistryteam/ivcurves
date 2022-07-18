@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download scores.json.zip
-        uses: dawidd6/action-download-artifact@v2
+        uses: dawidd6/action-download-artifact@v2.21.1
         with:
           workflow: parameter-fit-scorer.yaml
           run_id: ${{ github.event.workflow_run.id }};
