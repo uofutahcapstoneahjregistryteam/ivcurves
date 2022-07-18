@@ -5,7 +5,7 @@ import argparse
 
 # from ivcurves repo
 import utils
-from utils import mp, diff_lhs_rhs
+from utils import mp, diff_lhs_rhs, mp_nstr_precision_func
 import solution
 from max_power import lambert_i_from_v
 from precise import get_precise_i
@@ -365,7 +365,8 @@ def total_score(known_curve_params, fitted_curve_params, vth, num_pts, atol):
 
         # if voltage, current pair not a precise enough solution to single diode equation, make more precise
         dff = diff_lhs_rhs(new_voltage, new_current, il, io, rs, rsh, n, vth, ns)
-        if abs(dff) > atol:
+        assert abs(dff) < atol
+        if abs(dff) > atol: # never happens b/c lambert_i_from_v is to precision ~40?
             new_current = mp.findroot(lambda y : diff_lhs_rhs(new_voltage, y, il, io, rs, rsh, n, vth, ns), new_current, tol=atol**2)
 
         # calculate distance between these points, and add to score
@@ -583,6 +584,7 @@ if __name__ == "__main__":
     num_total_pts = 200
 
     scores = {}
+    nstr = utils.mp_nstr_precision_func
     for case_filename in utils.case_filenames():
         scores[case_filename] = {}
         case_filepath = f'{utils.TESTS_DIR}/{case_filename}'
@@ -590,7 +592,7 @@ if __name__ == "__main__":
         case_test_json = {int(test['Index']): test for test in case_json['IV Curves']}
         for test_idx, *iv_known in utils.read_case_parameters(case_filepath):
             iv_fitted = list(map(mp.mpmathify, solution.fit_parameters(case_test_json[test_idx])))
-            scores[case_filename][test_idx] = mp.nstr(total_score(iv_known, iv_fitted, vth, num_compare_pts, atol))
+            scores[case_filename][test_idx] = nstr(total_score(iv_known, iv_fitted, vth, num_compare_pts, atol))
 
     for case_filename, case_scores in scores.items():
         for test_idx, score in case_scores.items():
