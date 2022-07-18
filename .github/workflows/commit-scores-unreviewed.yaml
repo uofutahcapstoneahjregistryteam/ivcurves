@@ -11,11 +11,21 @@ jobs:
     name: Commit Scores (Unreviewed)
     runs-on: ubuntu-latest
     steps:
-      - name: Download scores.json.zip
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Download scores.json
         uses: dawidd6/action-download-artifact@v2.21.1
         with:
           workflow: parameter-fit-scorer.yaml
           run_id: ${{ github.event.workflow_run.id }}
       - name: Validate scores.json
-        run: head scores.json/scores.json
+        working-directory: .github/workflows
+        run: python validate_scores.py
+      - name: Commit scores to database
+        env:
+          ACTOR: ${{ github.actor }}
 
