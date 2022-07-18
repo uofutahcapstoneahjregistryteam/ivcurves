@@ -28,4 +28,5 @@ jobs:
       - name: Commit scores to database
         env:
           ACTOR: ${{ github.actor }}
+        run: echo $ACTOR
 
