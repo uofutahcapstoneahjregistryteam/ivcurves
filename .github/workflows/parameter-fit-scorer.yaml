@@ -20,7 +20,6 @@ jobs:
           mkdir -p ./pr
           python3 compare_curves.py
       - name: Save results
-        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/upload-artifact@v3
         with:
           name: scores.json
