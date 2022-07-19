@@ -15,7 +15,7 @@ def get_database_sha(GITHUB_HEADERS):
 
 
 def write_scores_to_database(database, scores_json):
-    database['test'] = scores
+    database['test'] = scores_json
 
 
 def push_new_database(database_b64, database_sha, GITHUB_HEADERS):
@@ -40,7 +40,7 @@ GITHUB_HEADERS = {'Accept': 'application/vnd.github+json',
 database = load_json(f'{BASE_DIR}/database')
 scores_json = load_json('scores.json/scores')
 
-write_scores_to_database(database)
+write_scores_to_database(database, scores_json)
 
 database_b64 = str(base64.b64encode(json.dumps(database).encode('ascii')))[2:-1]
 push_new_database(database_b64, GITHUB_HEADERS)
