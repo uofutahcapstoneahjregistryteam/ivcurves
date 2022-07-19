@@ -22,7 +22,7 @@ def push_new_database(database_b64, GITHUB_HEADERS):
     database_sha = get_database_sha(GITHUB_HEADERS)
     res = requests.put(DATABASE_URL,
                        headers=GITHUB_HEADERS,
-                       data={'message':'update database',
+                       json={'message':'update database',
                              'committer': {'name':'reepoi',
                                            'email':'reepoi@ivcurves'},
                              'content': f'{database_b64}',
