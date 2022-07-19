@@ -25,6 +25,8 @@ jobs:
       - name: Validate scores.json
         working-directory: .github/workflows
         run: python validate_scores.py
+      - name: Install Python Requests
+        run: pip install requests==2.28.1
       - name: Commit scores to database
         working-directory: .github/workflows
         run: python write_to_database.py ${{ secrets.GITHUB_TOKEN }}
