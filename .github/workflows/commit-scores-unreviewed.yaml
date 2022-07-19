@@ -18,11 +18,11 @@ jobs:
         with:
           python-version: '3.10'
       - name: Download scores.json
-        working-directory: .github/workflows
         uses: dawidd6/action-download-artifact@v2.21.1
         with:
           workflow: parameter-fit-scorer.yaml
           run_id: ${{ github.event.workflow_run.id }}
+          path: .github/workflows
       - name: Validate scores.json
         working-directory: .github/workflows
         run: python validate_scores.py
