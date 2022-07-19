@@ -5,7 +5,7 @@ import json
 
 
 BASE_DIR = '../..'
-SCORE_PATH = f'{BASE_DIR}/scores.json/scores.json'
+SCORE_PATH = f'scores.json/scores.json'
 TESTS_DIR = f'{BASE_DIR}/tests'
 
 
