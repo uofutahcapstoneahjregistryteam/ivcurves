@@ -18,7 +18,7 @@ def write_scores_to_database(database, scores_json):
     database['test'] = scores_json
 
 
-def push_new_database(database_b64, database_sha, GITHUB_HEADERS):
+def push_new_database(database_b64, GITHUB_HEADERS):
     database_sha = get_database_sha(GITHUB_HEADERS)
     res = requests.put(DATABASE_URL,
                        headers=GITHUB_HEADERS,
