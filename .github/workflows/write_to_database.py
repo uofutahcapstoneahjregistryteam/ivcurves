@@ -30,6 +30,6 @@ f'-H "Authorization: token {GITHUB_TOKEN}" '
 'https://api.github.com/repos/reepoi/ivcurves/contents/database.json '
 ).replace('"', '\'')
 bash_cmd_update_database += \
-    f'-d \'{{"message":"update database","committer":{{"name":"reepoi","email":"reepoi@ivcurves"}},"content":"{database_base64}"}}\''
+    f'-d \'{{"message":"update database","committer":{{"name":"reepoi","email":"reepoi@ivcurves"}},"content":"{database_base64}","sha":"63b1f9d549b40900dc4d107f832ce251b0dcbab2"}}\''
 print(bash_cmd_update_database)
 
