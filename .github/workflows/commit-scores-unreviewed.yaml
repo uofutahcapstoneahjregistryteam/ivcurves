@@ -26,7 +26,6 @@ jobs:
         working-directory: .github/workflows
         run: python validate_scores.py
       - name: Commit scores to database
-        env:
-          ACTOR: ${{ github.actor }}
-        run: echo $ACTOR
+        working-directory: .github/workflows
+        run: bash -c "$(python write_to_database.py ${{ GITHUB_TOKEN }})"
 
