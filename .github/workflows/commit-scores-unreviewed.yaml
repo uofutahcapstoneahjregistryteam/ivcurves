@@ -27,6 +27,5 @@ jobs:
         run: python validate_scores.py
       - name: Commit scores to database
         working-directory: .github/workflows
-        run: |
-          bash -c "$(python write_to_database.py ${{ secrets.GITHUB_TOKEN }})"
+        run: python write_to_database.py ${{ secrets.GITHUB_TOKEN }}
 
