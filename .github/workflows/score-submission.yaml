@@ -16,6 +16,8 @@ jobs:
         uses: actions/checkout@v2
       - name: Set Scorer Environment
         run: cat ./$GITHUB_ACTOR/pr_config.env >> $GITHUB_ENV
+      - name: Run env
+        run: env
 
   run-scorer:
     name: Run scorer
@@ -23,7 +25,7 @@ jobs:
     needs: read-pr-config
     if: needs.read-pr-config.outputs.run-scorer
     env:
-      PROGRAM_MAIN: needs.read-pr-config.outputs.program-main
+      PROGRAM_MAIN: ${{ needs.read-pr-config.outputs.program-main }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
