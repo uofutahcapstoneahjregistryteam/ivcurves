@@ -9,10 +9,12 @@ jobs:
     name: Read pull request config
     runs-on: ubuntu-latest
     outputs:
-      run-scorer: ${{ steps.set-env.outputs.run-scorer }}
+      run-scorer:
         description: Boolean whether run-scorer should run
-      program-main: ${{ steps.set-env.outputs.program-main }}
+        value: ${{ steps.set-env.outputs.run-scorer }}
+      program-main:
         description: file that should be executed by run-scorer
+        value: ${{ steps.set-env.outputs.program-main }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
