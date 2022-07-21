@@ -20,8 +20,8 @@ jobs:
           cat ./$GITHUB_ACTOR/pr_config.env >> $GITHUB_ENV
           echo $RUN_SCORER
           echo $PROGRAM_MAIN
-          echo '::set-output name=run-scorer::$RUN_SCORER'
-          echo '::set-output name=program-main::$PROGRAM_MAIN'
+          echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
+          echo '::set-output name=program-main::${{ env.PROGRAM_MAIN}}'
       - name: Run env
         run: env
 
