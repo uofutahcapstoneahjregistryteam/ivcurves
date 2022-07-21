@@ -57,5 +57,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: overall_scores.csv
-          path: ./$GITHUB_ACTOR/overall_scores.csv
+          path: ./${{ github.actor }}/overall_scores.csv
 
