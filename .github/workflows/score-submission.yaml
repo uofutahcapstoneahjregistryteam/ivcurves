@@ -9,19 +9,18 @@ jobs:
     name: Read pull request config
     runs-on: ubuntu-latest
     outputs:
-      run-scorer: ${{ steps.set-env.outputs.run-scorer }} # Boolean whether run-scorer should run
-      program-main: ${{ steps.set-env.outputs.program-main }} # file that should be executed by run-scorer
+      run-scorer: ${{ steps.save-env.outputs.run-scorer }} # Boolean whether run-scorer should run
+      program-main: ${{ steps.save-env.outputs.program-main }} # file that should be executed by run-scorer
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Set Scorer Environment
-        id: set-env
-        run: |
-          cat ./$GITHUB_ACTOR/pr_config.env >> $GITHUB_ENV
-          echo $RUN_SCORER
-          echo $PROGRAM_MAIN
+      - name: Set scorer environment
+        run: cat ./$GITHUB_ACTOR/pr_config.env >> $GITHUB_ENV
+      - name: Save scorer environment to job output
+        id: save-env
+        run:
           echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
-          echo '::set-output name=program-main::${{ env.PROGRAM_MAIN}}'
+          echo '::set-output name=program-main::${{ env.PROGRAM_MAIN }}'
       - name: Run env
         run: env
 
