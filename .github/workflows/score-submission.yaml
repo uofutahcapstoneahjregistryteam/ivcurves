@@ -25,6 +25,8 @@ jobs:
     env:
       PROGRAM_MAIN: needs.read-pr-config.outputs.program-main
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Install Python 3.10
         uses: actions/setup-python@v4
         with:
