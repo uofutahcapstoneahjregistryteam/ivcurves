@@ -1,3 +1,6 @@
+import argparse
+import os
+import csv
 import pvlib
 import matplotlib.pyplot as plt
 
@@ -564,25 +567,83 @@ def iv_plotter(iv_known, iv_fitted, vth, num_pts, atol, pts=[], plot_lines=True)
     return plot
 
 
+def get_test_sets_to_score(fitted_files_directory, test_set):
+    test_set_names = utils.get_filenames_in_directory(utils.TEST_SETS_DIR)
+    test_sets_to_score = []
+    if test_set:
+        if test_set not in test_set_names:
+            raise ValueError(f'\'{test_set}\' is not a test set')
+        test_sets_to_score = [test_set]
+    else:
+        filenames = utils.get_filenames_in_directory(fitted_files_directory)
+        test_sets_to_score = [f for f in filenames if f in test_set_names]
+        test_sets_to_score.sort()
+        if not test_sets_to_score:
+            raise ValueError(f'no test sets found in \'{fitted_files_directory}\'')
+    return test_sets_to_score
+
+
+def write_test_set_score_per_curve_csvs(scores):
+    csv_columns = ['Index', 'score']
+    nstr = utils.mp_nstr_precision_func
+    for name, cases in scores.items():
+        with open(f'{name}_scores.csv', 'w') as file:
+            writer = csv.writer(file, delimiter=',')
+            writer.writerow(csv_columns)
+            for idx, score in cases.items():
+                writer.writerow([idx, nstr(score)])
+
+
+def write_overall_scores_csv(scores):
+    csv_columns = ['test_set', 'score']
+    nstr = utils.mp_nstr_precision_func
+    with open('overall_scores.csv', 'w') as file:
+        writer = csv.writer(file, delimiter=',')
+        writer.writerow(csv_columns)
+        for name, cases in scores.items():
+            test_set_score_sum = sum(s for s in cases.values())
+            writer.writerow([name, nstr(test_set_score_sum)])
+
 
 ######## 
 # MAIN #
 ######## 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('fitted_files_directory', type=str,
+                        help='directory containing fitted parameter CSV files')
+    parser.add_argument('--test-set', dest='test_set', type=str, default='',
+                        help='name of test set to score')
+    args = parser.parse_args()
+
+    test_sets_to_score = get_test_sets_to_score(args.fitted_files_directory, args.test_set)
+    scores = {}
     num_compare_pts = 10
     num_total_pts = 200
-
-    # intersecting curves example
-    iv_known = list(map(mp.mpmathify, [6.0, 3.8500023e-06, 1.6816000000000002, 8832.800000000005, 1.4200000000000004, 72]))
-    iv_fitted = list(map(mp.mpmathify, [4.2, 6.500087e-07, 0.9453, 17881.40000000001, 1.6300000000000006, 72]))
-
     constants = utils.constants()
     vth, atol = constants['vth'], constants['atol']
 
-    print("Total score:", total_score(iv_known, iv_fitted, vth, num_compare_pts, atol))
+    for name in test_sets_to_score:
+        scores[name] = {}
+        known_parameter_sets = utils.read_iv_curve_parameter_sets(f'{utils.TEST_SETS_DIR}/{name}')
+        fitted_parameter_sets = utils.read_iv_curve_parameter_sets(f'{args.fitted_files_directory}/{name}')
+        known_parameter_sets.sort(key=lambda l: l[0])
+        fitted_parameter_sets.sort(key=lambda l: l[0])
+        for known_p, fitted_p in zip(known_parameter_sets, fitted_parameter_sets, strict=True):
+            scores[name][known_p[0]] = total_score(known_p[1:], fitted_p[1:], vth, num_compare_pts, atol)
 
-    fit_xs, fit_ys = get_curve(iv_fitted, vth, num_compare_pts, atol)
-    plot = iv_plotter(iv_known, iv_fitted, vth, num_total_pts, atol, pts=list(zip(fit_xs, fit_ys)), plot_lines=True)
-    plt.show()
+    write_test_set_score_per_curve_csvs(scores)
+    write_overall_scores_csv(scores)
+
+    # intersecting curves example
+    # iv_known = list(map(mp.mpmathify, [6.0, 3.8500023e-06, 1.6816000000000002, 8832.800000000005, 1.4200000000000004, 72]))
+    # iv_fitted = list(map(mp.mpmathify, [4.2, 6.500087e-07, 0.9453, 17881.40000000001, 1.6300000000000006, 72]))
+
+
+    # print("Total score:", total_score(iv_known, iv_fitted, vth, num_compare_pts, atol))
+
+    # fit_xs, fit_ys = get_curve(iv_fitted, vth, num_compare_pts, atol)
+    # plot = iv_plotter(iv_known, iv_fitted, vth, num_total_pts, atol, pts=list(zip(fit_xs, fit_ys)), plot_lines=True)
+    # plt.show()
 

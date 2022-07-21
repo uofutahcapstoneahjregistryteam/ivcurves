@@ -1,0 +1,43 @@
+name: Score Submission
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  read-pr-config:
+    name: Read pull request config
+    runs-on: ubuntu-latest
+    outputs:
+      run-scorer: $RUN_SCORER # Boolean whether scorer should be run
+      program-main: $PROGRAM_MAIN # file that should be ran by scorer
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set Scorer Environment
+        run: cat ./$GITHUB_ACTOR/pr_config.env >> $GITHUB_ENV
+
+  run-scorer:
+    needs: read-pr-config
+    if: needs.read-pr-config.outputs.run-scorer
+    env:
+      PROGRAM_MAIN: needs.read-pr-config.outputs.program-main
+    name: Run scorer
+      - name: Install Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install ivcurves requirements
+        run: pip3 install -r requirements.txt
+      - name: Install program requirements
+        run: pip3 install -r ./$GITHUB_ACTOR/requirements.txt
+      - name: Run program
+        run: python3 ./$GITHUB_ACTOR/$PROGRAM_MAIN
+      - name: Run scorer
+        run: python3 ./compare_curves.py
+      - name: Save scores to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: overall_scores.csv
+          path: ./$GITHUB_ACTOR/
+
