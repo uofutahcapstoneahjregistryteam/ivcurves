@@ -10,19 +10,17 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       run-scorer: ${{ steps.save-env.outputs.run-scorer }} # Boolean whether run-scorer should run
-      program-main: ${{ steps.save-env.outputs.program-main }} # file that should be executed by run-scorer
+      submission-main: ${{ steps.save-env.outputs.submission-main }} # file that should be executed by run-scorer
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set scorer environment
         run: cat ./${{ github.actor }}/pr_config.env >> ${{ github.env }}
       - name: Save scorer environment to job output
         id: save-env
         run: |
           echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
-          echo '::set-output name=program-main::${{ env.PROGRAM_MAIN }}'
-      - name: Run env
-        run: env
+          echo '::set-output name=submission-main::${{ env.SUBMISSION_MAIN }}'
 
   run-scorer:
     name: Run scorer
@@ -30,20 +28,18 @@ jobs:
     needs: read-pr-config
     if: ${{ needs.read-pr-config.outputs.run-scorer }}
     steps:
-      - name: Run env
-        run: env
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install Python 3.10
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
       - name: Install ivcurves requirements
         run: pip3 install -r requirements.txt
-      - name: Install program requirements
+      - name: Install submission requirements
         run: pip3 install -r ./${{ github.actor }}/requirements.txt
-      - name: Run program
-        run: python3 ./${{ github.actor }}/${{ needs.read-pr-config.outputs.program-main }}
+      - name: Run submission
+        run: python3 ./${{ github.actor }}/${{ needs.read-pr-config.outputs.submission-main }}
       - name: Run scorer
         run: python3 ./compare_curves.py ./${{ github.actor }}/ --csv-output-path ./${{ github.actor }}/
       - name: Save scores to artifacts
