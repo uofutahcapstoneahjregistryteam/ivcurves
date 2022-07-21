@@ -99,7 +99,7 @@ def read_iv_curve_parameter_sets(filename):
         rows = []
         for row in reader:
             rows.append(
-                [int(float(row['Index']))]
+                [int(row['Index'])]
                 + [mp.mpmathify(row[col], strings=True)
                     for col in IV_PARAMETER_NAMES]
             )
