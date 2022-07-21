@@ -18,11 +18,12 @@ jobs:
         run: cat ./$GITHUB_ACTOR/pr_config.env >> $GITHUB_ENV
 
   run-scorer:
+    name: Run scorer
+    runs-on: ubuntu-latest
     needs: read-pr-config
     if: needs.read-pr-config.outputs.run-scorer
     env:
       PROGRAM_MAIN: needs.read-pr-config.outputs.program-main
-    name: Run scorer
     steps:
       - name: Install Python 3.10
         uses: actions/setup-python@v4
