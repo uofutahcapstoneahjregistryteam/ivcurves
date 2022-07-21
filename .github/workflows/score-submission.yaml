@@ -18,7 +18,7 @@ jobs:
         run: cat ./$GITHUB_ACTOR/pr_config.env >> $GITHUB_ENV
       - name: Save scorer environment to job output
         id: save-env
-        run:
+        run: |
           echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
           echo '::set-output name=program-main::${{ env.PROGRAM_MAIN }}'
       - name: Run env
