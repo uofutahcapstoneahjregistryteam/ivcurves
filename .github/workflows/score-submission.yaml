@@ -39,7 +39,7 @@ jobs:
       PROGRAM_MAIN: ${{ needs.read-pr-config.outputs.program-main }}
     steps:
       - name: Run env
-      - run: env
+        run: env
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install Python 3.10
