@@ -1,4 +1,4 @@
-name: Score Submission
+name: Score submission
 
 on:
   - push
@@ -9,13 +9,21 @@ jobs:
     name: Read pull request config
     runs-on: ubuntu-latest
     outputs:
-      run-scorer: $RUN_SCORER # Boolean whether scorer should be run
-      program-main: $PROGRAM_MAIN # file that should be ran by scorer
+      run-scorer: ${{ steps.set-env.outputs.run-scorer }}
+        description: Boolean whether run-scorer should run
+      program-main: ${{ steps.set-env.outputs.program-main }}
+        description: file that should be executed by run-scorer
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set Scorer Environment
-        run: cat ./$GITHUB_ACTOR/pr_config.env >> $GITHUB_ENV
+        id: set-env
+        run: |
+          cat ./$GITHUB_ACTOR/pr_config.env >> $GITHUB_ENV
+          echo $RUN_SCORER
+          echo $PROGRAM_MAIN
+          echo '::set-output name=run-scorer::$(echo $RUN_SCORER)'
+          echo '::set-output name=program-main::$(echo $PROGRAM_MAIN)'
       - name: Run env
         run: env
 
@@ -25,8 +33,10 @@ jobs:
     needs: read-pr-config
     if: ${{ needs.read-pr-config.outputs.run-scorer }}
     env:
+      RUN_SCORER: ${{ needs.read-pr-config.outputs.run-scorer }}
       PROGRAM_MAIN: ${{ needs.read-pr-config.outputs.program-main }}
     steps:
+      - name: Run env
       - run: env
       - name: Checkout
         uses: actions/checkout@v2
@@ -39,9 +49,9 @@ jobs:
       - name: Install program requirements
         run: pip3 install -r ./$GITHUB_ACTOR/requirements.txt
       - name: Run program
-        run: python3 ./$GITHUB_ACTOR/$PROGRAM_MAIN
+        run: python3 ./$GITHUB_ACTOR/${{ needs.read-pr-config.outputs.program-main }}
       - name: Run scorer
-        run: python3 ./compare_curves.py
+        run: python3 ./compare_curves.py ./$GITHUB_ACTOR/ --csv-output-path ./$GITHUB_ACTOR/
       - name: Save scores to artifacts
         uses: actions/upload-artifact@v3
         with:

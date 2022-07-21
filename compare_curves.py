@@ -583,21 +583,21 @@ def get_test_sets_to_score(fitted_files_directory, test_set):
     return test_sets_to_score
 
 
-def write_test_set_score_per_curve_csvs(scores):
+def write_test_set_score_per_curve_csvs(scores, csv_output_path):
     csv_columns = ['Index', 'score']
     nstr = utils.mp_nstr_precision_func
     for name, cases in scores.items():
-        with open(f'{name}_scores.csv', 'w') as file:
+        with open(f'{csv_output_path}/{name}_scores.csv', 'w') as file:
             writer = csv.writer(file, delimiter=',')
             writer.writerow(csv_columns)
             for idx, score in cases.items():
                 writer.writerow([idx, nstr(score)])
 
 
-def write_overall_scores_csv(scores):
+def write_overall_scores_csv(scores, csv_output_path):
     csv_columns = ['test_set', 'score']
     nstr = utils.mp_nstr_precision_func
-    with open('overall_scores.csv', 'w') as file:
+    with open(f'{csv_output_path}/overall_scores.csv', 'w') as file:
         writer = csv.writer(file, delimiter=',')
         writer.writerow(csv_columns)
         for name, cases in scores.items():
@@ -615,6 +615,8 @@ if __name__ == '__main__':
                         help='directory containing fitted parameter CSV files')
     parser.add_argument('--test-set', dest='test_set', type=str, default='',
                         help='name of test set to score')
+    parser.add_argument('--csv-output-path', dest='csv_output_path', type=str,
+                        default='.', help='where to write output CSV files')
     args = parser.parse_args()
 
     test_sets_to_score = get_test_sets_to_score(args.fitted_files_directory, args.test_set)
@@ -633,8 +635,8 @@ if __name__ == '__main__':
         for known_p, fitted_p in zip(known_parameter_sets, fitted_parameter_sets, strict=True):
             scores[name][known_p[0]] = total_score(known_p[1:], fitted_p[1:], vth, num_compare_pts, atol)
 
-    write_test_set_score_per_curve_csvs(scores)
-    write_overall_scores_csv(scores)
+    write_test_set_score_per_curve_csvs(scores, args.csv_output_path)
+    write_overall_scores_csv(scores, args.csv_output_path)
 
     # intersecting curves example
     # iv_known = list(map(mp.mpmathify, [6.0, 3.8500023e-06, 1.6816000000000002, 8832.800000000005, 1.4200000000000004, 72]))
