@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set scorer environment
-        run: cat ./$GITHUB_ACTOR/pr_config.env >> $GITHUB_ENV
+        run: cat ./${{ github.actor }}/pr_config.env >> ${{ github.env }}
       - name: Save scorer environment to job output
         id: save-env
         run: |
@@ -29,9 +29,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: read-pr-config
     if: ${{ needs.read-pr-config.outputs.run-scorer }}
-    env:
-      RUN_SCORER: ${{ needs.read-pr-config.outputs.run-scorer }}
-      PROGRAM_MAIN: ${{ needs.read-pr-config.outputs.program-main }}
     steps:
       - name: Run env
         run: env
@@ -44,15 +41,11 @@ jobs:
       - name: Install ivcurves requirements
         run: pip3 install -r requirements.txt
       - name: Install program requirements
-        run: pip3 install -r ./$GITHUB_ACTOR/requirements.txt
+        run: pip3 install -r ./${{ github.actor }}/requirements.txt
       - name: Run program
-        run: python3 ./$GITHUB_ACTOR/${{ needs.read-pr-config.outputs.program-main }}
+        run: python3 ./${{ github.actor }}/${{ needs.read-pr-config.outputs.program-main }}
       - name: Run scorer
-        run: python3 ./compare_curves.py ./$GITHUB_ACTOR/ --csv-output-path ./$GITHUB_ACTOR/
-      - name: debug
-        run: |
-          ls
-          ls ./$GITHUB_ACTOR
+        run: python3 ./compare_curves.py ./${{ github.actor }}/ --csv-output-path ./${{ github.actor }}/
       - name: Save scores to artifacts
         uses: actions/upload-artifact@v3
         with:
