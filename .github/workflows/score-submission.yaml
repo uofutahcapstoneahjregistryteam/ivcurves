@@ -23,10 +23,11 @@ jobs:
     name: Run scorer
     runs-on: ubuntu-latest
     needs: read-pr-config
-    if: needs.read-pr-config.outputs.run-scorer
+    if: ${{ needs.read-pr-config.outputs.run-scorer }}
     env:
       PROGRAM_MAIN: ${{ needs.read-pr-config.outputs.program-main }}
     steps:
+      - run: env
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install Python 3.10
