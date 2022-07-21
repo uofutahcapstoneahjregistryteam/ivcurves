@@ -49,6 +49,10 @@ jobs:
         run: python3 ./$GITHUB_ACTOR/${{ needs.read-pr-config.outputs.program-main }}
       - name: Run scorer
         run: python3 ./compare_curves.py ./$GITHUB_ACTOR/ --csv-output-path ./$GITHUB_ACTOR/
+      - name: debug
+        run: |
+          ls
+          ls ./$GITHUB_ACTOR
       - name: Save scores to artifacts
         uses: actions/upload-artifact@v3
         with:
