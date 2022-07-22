@@ -1,5 +1,4 @@
 name: Score submission
-id: score-submission
 
 on:
   push:
