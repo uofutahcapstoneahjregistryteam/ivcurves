@@ -1,13 +1,13 @@
 name: Score submission
 
 on:
-  - push
-  - pull_request:
-      types:
-        - opened
-        - synchronize
-        - reopened
-        - closed
+  push:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
 
 jobs:
   read-pr-config:
