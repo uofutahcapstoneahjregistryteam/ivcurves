@@ -38,6 +38,7 @@ def validate_overall_scores(overall_scores):
 
 def get_database_sha(github_headers):
     res = requests.get(database_url, headers=github_headers)
+    print(res.json())
     return res.json()['sha']
 
 
@@ -54,6 +55,7 @@ def push_new_database(database_b64, github_headers):
                                            'email':'github@ivcurves'},
                              'content': f'{database_b64}',
                              'sha': f'{database_sha}'})
+    print(res.json())
     res.raise_for_status()
 
 
