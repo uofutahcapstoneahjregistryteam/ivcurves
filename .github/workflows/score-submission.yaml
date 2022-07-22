@@ -57,7 +57,7 @@ jobs:
       - name: Run submission
         run: python3 ./${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_MAIN }}
       - name: Run scorer
-        run: python3 ./compare_curves.py ./${{ env.CONTRIBUTOR }}/ \
+        run: python3 ./compare_curves.py ./${{ env.CONTRIBUTOR }}/
                --csv-output-path ./${{ env.CONTRIBUTOR }}/
       - name: Save scores to artifacts
         uses: actions/upload-artifact@v3
@@ -91,11 +91,11 @@ jobs:
           path: .github/workflows
       - name: Validate and record scores
         working-directory: .github/workflows
-        run: python utils/record_scores.py \
-               --github-token ${{ secrets.GITHUB_TOKEN }} \
-               --pr-author ${{ env.CONTRIBUTOR }} \
-               --pr-number ${{ github.event.number }} \
-               --repo-owner ${{ github.repository_owner }} \
-               --overall-scores-path ./overall_scores.csv/overall_scores.csv \
+        run: python utils/record_scores.py
+               --github-token ${{ secrets.GITHUB_TOKEN }}
+               --pr-author ${{ env.CONTRIBUTOR }}
+               --pr-number ${{ github.event.number }}
+               --repo-owner ${{ github.repository_owner }}
+               --overall-scores-path ./overall_scores.csv/overall_scores.csv
                --database-path ../../scores_database.json
 
