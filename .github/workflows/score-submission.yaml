@@ -73,6 +73,8 @@ jobs:
   record-scores:
     name: Record scores
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     needs:
       - read-pr-config
       - run-scorer
