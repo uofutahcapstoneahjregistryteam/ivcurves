@@ -6,7 +6,7 @@ import requests
 import pathlib
 
 
-TEST_SETS_DIR = '../../test_sets'
+TEST_SETS_DIR = 'test_sets'
 
 
 def load_json(filename):
@@ -73,17 +73,13 @@ if __name__ == '__main__':
                         help='Path to the JSON scores database')
     args = parser.parse_args()
 
-    overall_scores_path_absolute = pathlib.Path(args.overall_scores_path).resolve()
-    database_path_absolute = pathlib.Path(args.database_path).resolve()
-
-    database_path_in_repo = str(database_path_absolute).split('ivcurves/')[1]
-    database_url = f'https://api.github.com/repos/{args.repo_owner}/ivcurves/contents/{database_path_in_repo}'
+    database_url = f'https://api.github.com/repos/{args.repo_owner}/ivcurves/contents/{args.database_path}'
     github_headers = {'Accept': 'application/vnd.github+json',
                       'Authorization': f'token {args.github_token}'}
 
-    overall_scores = load_overall_scores(overall_scores_path_absolute)
+    overall_scores = load_overall_scores(args.overall_scores_path)
     validate_overall_scores(overall_scores)
-    database = load_json(database_path_absolute)
+    database = load_json(args.database_path)
     write_overall_scores_to_database(database, args.pr_number, args.pr_author, overall_scores)
 
     database_b64 = str(base64.b64encode(json.dumps(database).encode('ascii')))[2:-1]
