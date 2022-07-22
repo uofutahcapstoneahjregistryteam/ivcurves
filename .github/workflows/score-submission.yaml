@@ -71,8 +71,8 @@ jobs:
     needs:
       - read-pr-config
       - run-scorer
-    # if: ${{ github.event.pull_request.merged }}
-    # if: ${{ github.event.pull_request.merged && github.repository_owner == 'cwhanse' }}
+    if: ${{ github.event.pull_request.merged == true }}
+    # if: ${{ github.event.pull_request.merged == true && github.repository_owner == 'cwhanse' }}
     env:
       CONTRIBUTOR: ${{ needs.read-pr-config.outputs.contributor }}
     steps:
