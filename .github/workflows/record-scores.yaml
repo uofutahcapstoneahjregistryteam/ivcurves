@@ -26,12 +26,14 @@ jobs:
           workflow: score-submission.yaml
           run_id: ${{ github.event.workflow_run.id }}
           name: overall_scores.csv
+      - name: debug
+        run: ls
       - name: Validate and record scores
         run: python .github/workflows/utils/record_scores.py
                --github-token ${{ secrets.GITHUB_TOKEN }}
                --pr-author ${{ github.event.pull_request.user.login }}
                --pr-number ${{ github.event.number }}
                --repo-owner ${{ github.repository_owner }}
-               --overall-scores-path overall_scores.csv/overall_scores.csv
+               --overall-scores-path overall_scores.csv
                --database-path scores_database.json
 
