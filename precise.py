@@ -6,7 +6,7 @@ import json
 import datetime
 import max_power
 import utils
-from utils import mp, diff_lhs_rhs, mp_nstr_precision_func
+from utils import mp
 
 
 def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
@@ -81,7 +81,7 @@ def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
 
     # allocate array for new, more precise i's
     precise_i = np.zeros(ii.shape[0], dtype=mp.mpf)
-    i_precise_enough = lambda c: abs(diff_lhs_rhs(v, c, il, io, rs, rsh, n, vth, ns)) < atol
+    i_precise_enough = lambda c: abs(utils.diff_lhs_rhs(v, c, il, io, rs, rsh, n, vth, ns)) < atol
     for idx, (v, i) in enumerate(zip(vv, ii, strict=True)):
         # check if i val already precise enough
         if i_precise_enough(i): 
@@ -155,13 +155,13 @@ def write_case_tests(case_filename, case_parameter_sets, vth, temp_cell, atol,
 
 if __name__ == "__main__":
     case_number = 1
-    case_filename = f'tests/case{case_number}'
+    case_filename = f'{utils.TEST_SETS_DIR}/case{case_number}'
     case_title = f'Case {case_number}'
 
     constants = utils.constants()
     vth, temp_cell, atol, num_pts = (constants['vth'], constants['temp_cell'],
                                      constants['atol'], constants['num_pts'])
-    case_parameter_sets = utils.read_case_parameters(case_filename)
+    case_parameter_sets = utils.read_iv_curve_parameter_sets(case_filename)
 
     write_case_tests(case_filename, case_parameter_sets, vth, temp_cell, atol,
                      num_pts)

@@ -1,0 +1,103 @@
+name: Score submission
+
+on:
+  push:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+jobs:
+  read-pr-config:
+    name: Read pull request config
+    runs-on: ubuntu-latest
+    outputs:
+      contributor: ${{ steps.save-env.outputs.contributor }}
+      run-scorer: ${{ steps.save-env.outputs.run-scorer }} # Boolean whether run-scorer should run
+      submission-main: ${{ steps.save-env.outputs.submission-main }} # file that should be executed by run-scorer
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Save pull request contributor username
+        id: save-pr-author
+        run: echo '::set-output name=contributor::${{ github.event.pull_request.user.login }}'
+      - name: Save GitHub actor username
+        id: save-github-actor
+        if: ${{ steps.save-pr-author.outputs.contributor == '' }}
+        run: echo '::set-output name=contributor::${{ github.actor }}'
+      - name: Set the contributor environment
+        env:
+          CONTRIBUTOR: ${{ join(steps.*.outputs.contributor, '') }}
+        run: |
+          echo 'CONTRIBUTOR=${{ env.CONTRIBUTOR }}' >> ${{ github.env }}
+          cat ./${{ env.CONTRIBUTOR }}/pr_config.env >> ${{ github.env }}
+      - name: Save scorer environment to job output
+        id: save-env
+        run: |
+          echo '::set-output name=contributor::${{ env.CONTRIBUTOR }}'
+          echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
+          echo '::set-output name=submission-main::${{ env.SUBMISSION_MAIN }}'
+
+  run-scorer:
+    name: Run scorer
+    runs-on: ubuntu-latest
+    needs: read-pr-config
+    if: ${{ needs.read-pr-config.outputs.run-scorer }}
+    env:
+      CONTRIBUTOR: ${{ needs.read-pr-config.outputs.contributor }}
+      SUBMISSION_MAIN: ${{ needs.read-pr-config.outputs.submission-main }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install ivcurves requirements
+        run: pip3 install -r requirements.txt
+      - name: Install submission requirements
+        run: pip3 install -r ./${{ env.CONTRIBUTOR }}/requirements.txt
+      - name: Run submission
+        run: python3 ./${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_MAIN }}
+      - name: Run scorer
+        run: python3 ./compare_curves.py ./${{ env.CONTRIBUTOR }}/
+               --csv-output-path ./${{ env.CONTRIBUTOR }}/
+      - name: Save scores to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: overall_scores.csv
+          path: ./${{ env.CONTRIBUTOR }}/overall_scores.csv
+
+  record-scores:
+    name: Record scores
+    runs-on: ubuntu-latest
+    needs:
+      - read-pr-config
+      - run-scorer
+    if: ${{ github.event.pull_request.merged == true && github.ref_type == 'branch' && github.ref_name == 'main' && github.repository_owner == 'reepoi' }}
+    env:
+      CONTRIBUTOR: ${{ needs.read-pr-config.outputs.contributor }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Python Requests
+        run: pip install requests==2.28.1
+      - name: Download overall_scores.csv
+        uses: actions/download-artifact@v3
+        with:
+          name: overall_scores.csv
+      - name: Validate and record scores
+        run: python .github/workflows/utils/record_scores.py
+               --github-token ${{ secrets.GITHUB_TOKEN }}
+               --pr-author ${{ env.CONTRIBUTOR }}
+               --pr-number ${{ github.event.number }}
+               --repo-owner ${{ github.repository_owner }}
+               --overall-scores-path overall_scores.csv
+               --database-path scores_database.json
+

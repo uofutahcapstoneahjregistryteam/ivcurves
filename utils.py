@@ -1,9 +1,13 @@
 import os
 import csv
+import pathlib
 from mpmath import mp
 
 
-TESTS_DIR = 'tests'
+TEST_SETS_DIR = 'test_sets'
+IV_PARAMETER_NAMES = ['photocurrent', 'saturation_current',
+                      'resistance_series', 'resistance_shunt', 'n',
+                      'cells_in_series']
 
 
 def set_globals():
@@ -73,7 +77,7 @@ def mp_nstr_precision_func(num_mpf):
     return mp.nstr(num_mpf, n=ldigits+precision, strip_zeros=False)
 
 
-def read_case_parameters(filename):
+def read_iv_curve_parameter_sets(filename):
     r"""
     Returns a 2-D list of entries in a CSV file with these column names:
     Index, photocurrent, saturation_current, resistance_series,
@@ -92,36 +96,27 @@ def read_case_parameters(filename):
     """
     with open(f'{filename}.csv', newline='') as file:
         reader = csv.DictReader(file, delimiter=',')
-        parameter_columns = ['photocurrent', 'saturation_current',
-                             'resistance_series', 'resistance_shunt', 'n',
-                             'cells_in_series']
         rows = []
         for row in reader:
             rows.append(
                 [int(row['Index'])]
                 + [mp.mpmathify(row[col], strings=True)
-                    for col in parameter_columns]
+                    for col in IV_PARAMETER_NAMES]
             )
         return rows
 
 
-def case_filenames():
+def get_filenames_in_directory(directory_path):
     """
-    Returns a sorted list of filenames in the directory `TESTS_DIR`.
+    Returns a set of filenames in the directory `directory_path`.
     The filenames do not have file extensions.
 
     Returns
     -------
-    list
-        A sorted list of filenames without file extensions.
+    set
+        A set of filenames without file extensions.
     """
-    res = set()
-    for _, _, filenames in os.walk(TESTS_DIR):
-        for filename in filenames:
-            res.add(filename.split(".")[0])
-    res = list(res)
-    res.sort()
-    return res
+    return {entry.stem for entry in pathlib.Path(directory_path).iterdir()}
 
 
 def diff_lhs_rhs(v, i, il, io, rs, rsh, n, vth, ns):
