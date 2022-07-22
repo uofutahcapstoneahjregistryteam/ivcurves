@@ -84,6 +84,6 @@ if __name__ == '__main__':
     database = load_json(args.database_path)
     write_overall_scores_to_database(database, args.pr_number, args.pr_author, overall_scores)
 
-    database_b64 = str(base64.b64encode(json.dumps(database).encode('ascii')))[2:-1]
+    database_b64 = str(base64.b64encode(json.dumps(database, indent=2).encode('ascii')))[2:-1]
     push_new_database(database_b64, github_headers)
 
