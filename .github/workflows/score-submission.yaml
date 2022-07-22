@@ -69,9 +69,11 @@ jobs:
           path: .github/workflows
       - name: Validate and record scores
         working-directory: .github/workflows
-        run: python record_scores.py \
+        run: python utils/record_scores.py \
                --github-token ${{ secrets.GITHUB_TOKEN }} \
-               --pr-number ${{ github.event.number }}
+               --pr-author ${{ github.event.pull_request.user.login }} \
+               --pr-number ${{ github.event.number }} \
                --repo-owner ${{ github.repository_owner }} \
-               --database ../../scores_database.json
+               --overall-scores-path ./overall_scores.csv/overall_scores.csv \
+               --database-path ../../scores_database.json
 
