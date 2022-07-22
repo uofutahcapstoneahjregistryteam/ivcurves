@@ -1,4 +1,5 @@
 import argparse
+import base64
 import csv
 import json
 import requests
@@ -9,13 +10,13 @@ TEST_SETS_DIR = '../../test_sets'
 
 
 def load_json(filename):
-    with open(f'{filename}.json', 'r') as file:
+    with open(filename, 'r') as file:
         return json.load(file)
 
 
-def load_overall_scores(filename)
+def load_overall_scores(filename):
     overall_scores = {}
-    with open(f'{filename}.csv', newline='') as file:
+    with open(filename, newline='') as file:
         reader = csv.DictReader(file)
         for row in reader:
             overall_scores[row['test_set']] = row['score']
@@ -23,20 +24,20 @@ def load_overall_scores(filename)
 
 
 def test_set_filenames():
-    return {entry.name for entry in pathlib.Path(TEST_SETS_DIR).iterdir()
+    return {entry.stem for entry in pathlib.Path(TEST_SETS_DIR).iterdir()
                 if entry.is_file()}
 
 
 def validate_overall_scores(overall_scores):
     valid_test_set_names = test_set_filenames()
-    for test_set, score_str in overall_scores:
-        if row['test_set'] not in valid_test_set_names():
-            raise ValueError('\'{test_set}\' is not a test set')
-        float(row['score']) # validate is a number
+    for test_set, score_str in overall_scores.items():
+        if test_set not in valid_test_set_names:
+            raise ValueError(f'\'{test_set}\' is not a test set')
+        float(score_str) # validate is a number
 
 
-def get_database_sha(GITHUB_HEADERS):
-    res = requests.get(DATABASE_URL, headers=GITHUB_HEADERS)
+def get_database_sha(github_headers):
+    res = requests.get(database_url, headers=github_headers)
     return res.json()['sha']
 
 
@@ -44,10 +45,10 @@ def write_overall_scores_to_database(database, pr_number, pr_author, overall_sco
     database[pr_number] = {'username': pr_author, 'tests': overall_scores}
 
 
-def push_new_database(database_b64, GITHUB_HEADERS):
-    database_sha = get_database_sha(GITHUB_HEADERS)
-    res = requests.put(DATABASE_URL,
-                       headers=GITHUB_HEADERS,
+def push_new_database(database_b64, github_headers):
+    database_sha = get_database_sha(github_headers)
+    res = requests.put(database_url,
+                       headers=github_headers,
                        json={'message':'update database',
                              'committer': {'name':'GitHub',
                                            'email':'github@ivcurves'},
@@ -80,11 +81,11 @@ if __name__ == '__main__':
     github_headers = {'Accept': 'application/vnd.github+json',
                       'Authorization': f'token {args.github_token}'}
 
-    overall_scores = load_overall_scores(overall_scores_path_absolute.stem)
+    overall_scores = load_overall_scores(overall_scores_path_absolute)
     validate_overall_scores(overall_scores)
-    database = load_json(database_path_absolute.stem)
+    database = load_json(database_path_absolute)
     write_overall_scores_to_database(database, args.pr_number, args.pr_author, overall_scores)
 
     database_b64 = str(base64.b64encode(json.dumps(database).encode('ascii')))[2:-1]
-    push_new_database(database_b64, GITHUB_HEADERS)
+    push_new_database(database_b64, github_headers)
 
