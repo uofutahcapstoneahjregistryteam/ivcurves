@@ -2,7 +2,7 @@ import pvlib
 
 # from ivcurves repo
 import utils
-from utils import mp, diff_lhs_rhs
+from utils import mp
 
 
 ###################
@@ -83,9 +83,9 @@ def max_power_pt_finder(il, io, rs, rsh, n, vth, ns, atol):
 
     # check that current, voltage pair is still a precise solution to single diode eq
     # if not precise enough, make precise using findroot
-    dff = diff_lhs_rhs(max_voltage, max_current, il, io, rs, rsh, n, vth, ns)
+    dff = utils.diff_lhs_rhs(max_voltage, max_current, il, io, rs, rsh, n, vth, ns)
     if abs(dff) > atol:
-        max_current = mp.findroot(lambda x: diff_lhs_rhs(max_voltage, x, il, io, rs, rsh, n, vth, ns), max_current, tol=atol**2)
+        max_current = mp.findroot(lambda x: utils.diff_lhs_rhs(max_voltage, x, il, io, rs, rsh, n, vth, ns), max_current, tol=atol**2)
         # setting tol=atol**2 because findroot checks func(zero)**2 < tol
 
     return max_voltage, max_current, max_power
@@ -380,14 +380,14 @@ def lambert_v_from_i(i, il, io, rs, rsh, n, vth, ns):
 
 if __name__ == "__main__":
     case_number = 1
-    case_filename = f'tests/case{case_number}'
+    case_filename = f'test_sets/case{case_number}'
 
     parameters = dict()
     max_vals = dict()
     constants = utils.constants()
     vth, atol = constants['vth'], constants['atol']
 
-    for test_idx, il, io, rs, rsh, n, ns in utils.read_case_parameters(case_filename):
+    for test_idx, il, io, rs, rsh, n, ns in utils.read_iv_curve_parameter_sets(case_filename):
         max_voltage, max_current, max_power = max_power_pt_finder(il, io, rs, rsh, n, vth, ns, atol)
         parameters[test_idx] = [il, io, rs, rsh, n]
         max_vals[test_idx] = [max_voltage, max_current, max_power]
