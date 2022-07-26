@@ -33,6 +33,7 @@ jobs:
                --github-token ${{ secrets.GITHUB_TOKEN }}
                --pr-author ${{ github.event.pull_request.user.login }}
                --pr-number ${{ github.event.number }}
+               --pr-closed-at ${{ github.event.pull_request.closed_at }}
                --repo-owner ${{ github.repository_owner }}
                --overall-scores-path overall_scores.csv
                --database-path scores_database.json
