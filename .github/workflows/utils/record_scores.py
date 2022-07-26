@@ -1,6 +1,7 @@
 import argparse
 import base64
 import csv
+import datetime
 import json
 import requests
 import pathlib
@@ -42,8 +43,10 @@ def get_database_sha(github_headers):
     return res.json()['sha']
 
 
-def write_overall_scores_to_database(database, pr_number, pr_author, overall_scores):
-    database[pr_number] = {'username': pr_author, 'test_sets': overall_scores}
+def write_overall_scores_to_database(database, pr_number, pr_author, pr_closed_datetime, overall_scores):
+    database[pr_number] = {'username': pr_author,
+                           'submission_datetime': pr_closed_datetime,
+                           'test_sets': overall_scores}
 
 
 def push_new_database(database_b64, github_headers):
@@ -67,6 +70,8 @@ if __name__ == '__main__':
                         help='GitHub username of the pull request author')
     parser.add_argument('--pr-number', dest='pr_number', type=int,
                         help='GitHub pull request number')
+    parser.add_argument('--pr-closed-at', dest='pr_closed_datetime', type=str,
+                        help='Datetime when the GitHub pull request closed')
     parser.add_argument('--repo-owner', dest='repo_owner', type=str,
                         help='GitHub username of the repository\'s owner')
     parser.add_argument('--overall-scores-path', dest='overall_scores_path', type=str,
@@ -82,8 +87,7 @@ if __name__ == '__main__':
     overall_scores = load_overall_scores(args.overall_scores_path)
     validate_overall_scores(overall_scores)
     database = load_json(args.database_path)
-    write_overall_scores_to_database(database, args.pr_number, args.pr_author, overall_scores)
+    write_overall_scores_to_database(database, args.pr_number, args.pr_author, args.pr_closed_datetime, overall_scores)
 
     database_b64 = str(base64.b64encode(json.dumps(database, indent=2).encode('ascii')))[2:-1]
     push_new_database(database_b64, github_headers)
-
