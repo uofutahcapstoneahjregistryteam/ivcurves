@@ -43,7 +43,7 @@ def get_database_sha(github_headers):
 
 
 def write_overall_scores_to_database(database, pr_number, pr_author, overall_scores):
-    database[pr_number] = {'username': pr_author, 'tests': overall_scores}
+    database[pr_number] = {'username': pr_author, 'test_sets': overall_scores}
 
 
 def push_new_database(database_b64, github_headers):

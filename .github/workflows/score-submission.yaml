@@ -3,6 +3,10 @@ name: Score submission
 on:
   push:
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
   read-pr-config:
