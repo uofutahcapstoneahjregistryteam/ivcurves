@@ -91,4 +91,3 @@ if __name__ == '__main__':
 
     database_b64 = str(base64.b64encode(json.dumps(database, indent=2).encode('ascii')))[2:-1]
     push_new_database(database_b64, github_headers)
-
