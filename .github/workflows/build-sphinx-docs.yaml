@@ -12,8 +12,11 @@ jobs:
     name: Build Sphinx docs
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v3
+        with:
+          ref: main
+          path: main
       - name: Install Python 3.10
         uses: actions/setup-python@v4
         with:
@@ -38,6 +41,7 @@ jobs:
       - name: Checkout gh-pages branch
         uses: actions/checkout@v3
         with:
+          ref: gh-pages
           path: gh-pages
       - name: debug
         run: |
