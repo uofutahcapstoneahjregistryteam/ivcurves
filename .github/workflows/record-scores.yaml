@@ -39,6 +39,7 @@ jobs:
                --overall-scores-path overall_scores.csv
                --database-path scores_database.json
       - name: Install Sphinx docs requirements
+        working-directory: docs/sphinx
         run: |
           pip3 install -U sphinx
           pip3 install -r requirements.txt
