@@ -4,7 +4,7 @@ import pathlib
 from mpmath import mp
 
 
-TEST_SETS_DIR = 'test_sets'
+TEST_SETS_DIR = f'{pathlib.Path(__file__).parent}/test_sets'
 IV_PARAMETER_NAMES = ['photocurrent', 'saturation_current',
                       'resistance_series', 'resistance_shunt', 'n',
                       'cells_in_series']
@@ -104,6 +104,28 @@ def read_iv_curve_parameter_sets(filename):
                     for col in IV_PARAMETER_NAMES]
             )
         return rows
+
+
+def make_iv_curve_name(test_set_name, index):
+    r"""
+    Returns a unique name for an IV curve created from parameters of
+    a test set's test case.
+
+    Parameters
+    ----------
+    test_set_name : string
+        The name of the test set that contains the test case of the IV curve's
+        parameters.
+
+    index : int
+        The Index of the test case of the IV curve's parameters.
+
+    Returns
+    -------
+    string
+        A unique name for the IV curve.
+    """
+    return f'{test_set_name}_case_{index}'
 
 
 def get_filenames_in_directory(directory_path):

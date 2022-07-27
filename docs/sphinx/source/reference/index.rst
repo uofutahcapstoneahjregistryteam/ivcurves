@@ -1,4 +1,4 @@
-Reference
+IV Curves
 =========
 
 .. toctree::
