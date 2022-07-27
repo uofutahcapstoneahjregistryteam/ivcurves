@@ -41,7 +41,7 @@ jobs:
       - name: Rebuild Sphinx docs
         working-directory: docs/sphinx
         run: |
-          python3 ../../precise.py --save-images ./_images/test_cases
+          # python3 ../../precise.py --save-images ./_images/test_cases
           make html
           git --version
           git config user.name "GitHub"
