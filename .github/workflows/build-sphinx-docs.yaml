@@ -42,5 +42,5 @@ jobs:
           git config user.email "github@ivcurves"
           git add build # The build html files
           git commit -m 'Update Sphinx docs'
-          git push origin gh-pages # Make sure gh-pages branch exists in repo
+          git push origin HEAD:gh-pages # Make sure gh-pages branch exists in repo
 
