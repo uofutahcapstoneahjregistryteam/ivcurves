@@ -30,12 +30,8 @@ jobs:
           pip3 install -U sphinx
           pip3 install -r requirements.txt
       - name: Generate Sphinx docs test case images
-        working-directory: main/docs/sphinx/source
-        run: |
-          mkdir -p _static
-          mkdir -p _images
-          mkdir -p _images/test_cases
-          python3 ../../../precise.py --save-images _images/test_cases
+        working-directory: main
+        run: python3 precise.py --save-images docs/sphinx/source/_images/test_cases
       - name: Rebuild Sphinx docs html
         working-directory: main/docs/sphinx
         run: make html
