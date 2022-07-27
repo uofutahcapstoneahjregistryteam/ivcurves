@@ -1,4 +1,4 @@
-.. currentmodule:: reepoi
+.. currentmodule:: submissions.reepoi
 
 reepoi
 ======
