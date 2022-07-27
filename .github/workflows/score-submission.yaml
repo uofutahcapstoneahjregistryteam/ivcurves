@@ -32,7 +32,7 @@ jobs:
           CONTRIBUTOR: ${{ join(steps.*.outputs.contributor, '') }}
         run: |
           echo 'CONTRIBUTOR=${{ env.CONTRIBUTOR }}' >> ${{ github.env }}
-          cat ./${{ env.CONTRIBUTOR }}/pr_config.env >> ${{ github.env }}
+          cat submissions/${{ env.CONTRIBUTOR }}/pr_config.env >> ${{ github.env }}
       - name: Save scorer environment to job output
         id: save-env
         run: |
