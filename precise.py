@@ -1,3 +1,4 @@
+import argparse
 import pvlib
 import numpy as np
 import matplotlib.pyplot as plt
@@ -115,15 +116,25 @@ def plotter(il, io, rs, rsh, n, vth, ns, atol, num_pts, case_title):
     return plt.plot(v_vals, i_vals)
 
 
-def plot_case_iv_curves(case_title, case_parameter_sets, vth, atol, num_pts):
+def save_iv_curve_images(test_set_name, case_parameter_sets, vth, atol, num_pts):
+    plt.style.use('seaborn-darkgrid')
+    for idx, il, io, rs, rsh, n, ns in case_parameter_sets:
+        plot = plotter(il, io, rs, rsh, n, vth, ns, atol, num_pts, '')
+        plt.savefig(utils.make_iv_curve_name(test_set_name, idx),
+                    bbox_inches='tight')
+        plt.cla()
+
+
+def plot_iv_curves(test_set_name, case_parameter_sets, vth, atol, num_pts):
     plt.style.use('seaborn-darkgrid')
     plot = plt.plot()
-    for _, il, io, rs, rsh, n, ns in case_parameter_sets:
-        plot += plotter(il, io, rs, rsh, n, vth, ns, atol, num_pts, case_title)
+    for idx, il, io, rs, rsh, n, ns in case_parameter_sets:
+        plot += plotter(il, io, rs, rsh, n, vth, ns, atol, num_pts,
+                        utils.make_iv_curve_name(test_set_name, idx))
     plt.show()
 
 
-def write_case_tests(case_filename, case_parameter_sets, vth, temp_cell, atol,
+def write_test_set_json(test_set_filename, case_parameter_sets, vth, temp_cell, atol,
                      num_pts):
     case_test_suite = {'Manufacturer': '', 'Sandia ID': '', 'Material': '',
                        'IV Curves': []}
@@ -149,21 +160,35 @@ def write_case_tests(case_filename, case_parameter_sets, vth, temp_cell, atol,
             'Sweep direction': None, 'Datetime': None
         })
 
-    with open(f'{case_filename}.json', 'w') as file:
+    with open(f'{test_set_filename}.json', 'w') as file:
         json.dump(case_test_suite, file, indent=2)
 
 
-if __name__ == "__main__":
-    case_number = 1
-    case_filename = f'{utils.TEST_SETS_DIR}/case{case_number}'
-    case_title = f'Case {case_number}'
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--test-set', dest='test_set_name', type=str,
+                        help='Name of the test set to generate curves for')
+    parser.add_argument('--save-json', dest='save_json_path', type=str,
+                        help='Saves the test set JSON at the given path')
+    parser.add_argument('--save-images', dest='save_images_path', type=str,
+                        help='saves the test set IV curve plots at the given path')
+    parser.add_argument('--plot', action=argparse.BooleanOptionalAction)
+    args = parser.parse_args()
+
+    if args.test_set_name:
+        test_set_names = [test_set_name]
+    else:
+        test_set_names = utils.get_filenames_in_directory(utils.TEST_SETS_DIR)
 
     constants = utils.constants()
     vth, temp_cell, atol, num_pts = (constants['vth'], constants['temp_cell'],
                                      constants['atol'], constants['num_pts'])
-    case_parameter_sets = utils.read_iv_curve_parameter_sets(case_filename)
-
-    write_case_tests(case_filename, case_parameter_sets, vth, temp_cell, atol,
-                     num_pts)
-    plot_case_iv_curves(case_title, case_parameter_sets, vth, atol, num_pts)
+    for name in test_set_names:
+        case_parameter_sets = utils.read_iv_curve_parameter_sets(f'{utils.TEST_SETS_DIR}/{name}')
+        if args.save_json_path:
+            write_test_set_json(f'{args.save_json_path}/{name}', case_parameter_sets, vth, temp_cell, atol, num_pts)
+        if args.save_images_path:
+            save_iv_curve_images(f'{args.save_images_path}/{name}', case_parameter_sets, vth, atol, num_pts)
+        if args.plot:
+            plot_iv_curves(name, case_parameter_sets, vth, atol, num_pts)
 
