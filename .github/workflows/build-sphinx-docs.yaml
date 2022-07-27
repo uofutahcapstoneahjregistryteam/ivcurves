@@ -34,11 +34,13 @@ jobs:
           python3 ../../../precise.py --save-images _images/test_cases
       - name: Rebuild Sphinx docs html
         working-directory: docs/sphinx
+        run: make html
+      - name: Commit and push docs to gh-pages
+        working-directory: docs/sphinx
         run: |
-          make html
           git config user.name "GitHub"
           git config user.email "github@ivcurves"
           git add build # The build html files
           git commit -m 'Update Sphinx docs'
-          git push https://github.com/reepoi/ivcurves.git gh-pages # Make sure gh-pages branch exists in repo
+          git push origin gh-pages # Make sure gh-pages branch exists in repo
 
