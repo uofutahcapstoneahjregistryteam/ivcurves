@@ -25,14 +25,13 @@ jobs:
         with:
           workflow: score-submission.yaml
           run_id: ${{ github.event.workflow_run.id }}
+          pr: ${{ github.event.pull_request.number }}
           name: overall_scores.csv
-      - name: debug
-        run: ls
       - name: Validate and record scores
         run: python .github/workflows/utils/record_scores.py
                --github-token ${{ secrets.GITHUB_TOKEN }}
                --pr-author ${{ github.event.pull_request.user.login }}
-               --pr-number ${{ github.event.number }}
+               --pr-number ${{ github.event.pull_request.number }}
                --pr-closed-at ${{ github.event.pull_request.closed_at }}
                --repo-owner ${{ github.repository_owner }}
                --overall-scores-path overall_scores.csv
@@ -40,7 +39,7 @@ jobs:
       - name: Rebuild Sphinx docs
         working-directory: docs/sphinx/
         run: |
-          python3 precise.py --save-images ./_images/test_cases/
+          python3 ../../precise.py --save-images ./_images/test_cases/
           make html
           # setup the username and email. I tend to use 'GitHub Actions Bot' with no email by default
           git --version
