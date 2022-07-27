@@ -20,8 +20,6 @@ jobs:
           python-version: '3.10'
       - name: Install ivcurves requirements
         run: pip3 install -r requirements.txt
-      - name: Install Python Requests
-        run: pip3 install requests==2.28.1
       - name: Download overall_scores.csv
         uses: dawidd6/action-download-artifact@v2.21.1
         with:
@@ -31,11 +29,16 @@ jobs:
           name: overall_scores.csv
       - name: Validate and record scores
         run: python3 .github/workflows/utils/record_scores.py
-               --github-token ${{ secrets.GITHUB_TOKEN }}
                --pr-author ${{ github.event.pull_request.user.login }}
                --pr-number ${{ github.event.pull_request.number }}
                --pr-closed-at ${{ github.event.pull_request.closed_at }}
-               --repo-owner ${{ github.repository_owner }}
                --overall-scores-path overall_scores.csv
                --database-path scores_database.json
+      - name: Commit and push scores database
+        run: |
+          git config user.name 'GitHub'
+          git config user.email 'github@ivcurves'
+          git add scores_database.json
+          git commit -m 'Update scores database'
+          git push origin main
 
