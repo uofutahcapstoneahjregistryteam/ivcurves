@@ -38,13 +38,13 @@ jobs:
                --repo-owner ${{ github.repository_owner }}
                --overall-scores-path overall_scores.csv
                --database-path scores_database.json
-      # - name: Rebuild Sphinx docs
-      #   working-directory: docs/sphinx
-      #   run: |
-      #     python3 ../../precise.py --save-images ./_images/test_cases
-      #     make html
-      #     git --version
-      #     git config user.name "GitHub"
-      #     git config user.email "github@ivcurves"
-      #     git status
+      - name: Rebuild Sphinx docs
+        working-directory: docs/sphinx
+        run: |
+          python3 ../../precise.py --save-images ./_images/test_cases
+          make html
+          git --version
+          git config user.name "GitHub"
+          git config user.email "github@ivcurves"
+          git status
 
