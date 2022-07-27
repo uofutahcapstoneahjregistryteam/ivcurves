@@ -4,7 +4,7 @@ import json
 import pathlib
 
 
-ROOT_DIR = pathlib.Path(f'{__file__}/../../..').resolve()
+ROOT_DIR = pathlib.Path(f'{__file__}/../../../..').resolve()
 TEST_SETS_DIR = pathlib.Path(f'{ROOT_DIR}/test_sets')
 
 
