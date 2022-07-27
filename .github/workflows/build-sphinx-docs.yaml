@@ -12,7 +12,7 @@ jobs:
     name: Build Sphinx docs
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main
+      - name: Checkout main branch
         uses: actions/checkout@v3
         with:
           ref: main
