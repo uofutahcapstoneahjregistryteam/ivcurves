@@ -15,7 +15,8 @@ jobs:
     outputs:
       contributor: ${{ steps.save-env.outputs.contributor }}
       run-scorer: ${{ steps.save-env.outputs.run-scorer }} # Boolean whether run-scorer should run
-      submission-main: ${{ steps.save-env.outputs.submission-main }} # file that should be executed by run-scorer
+      submission-path: ${{ steps.save-env.outputs.submission-path }} # directory that contains the submission
+      submission-main: ${{ steps.save-env.outputs.submission-main }} # path from submission-path to file that should be executed by run-scorer
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -37,6 +38,7 @@ jobs:
         run: |
           echo '::set-output name=contributor::${{ env.CONTRIBUTOR }}'
           echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
+          echo '::set-output name=submission-main::${{ env.SUBMISSION_PATH }}'
           echo '::set-output name=submission-main::${{ env.SUBMISSION_MAIN }}'
 
   run-scorer:
@@ -46,6 +48,7 @@ jobs:
     if: ${{ needs.read-pr-config.outputs.run-scorer }}
     env:
       CONTRIBUTOR: ${{ needs.read-pr-config.outputs.contributor }}
+      SUBMISSION_PATH: ${{ needs.read-pr-config.outputs.submission-path }}
       SUBMISSION_MAIN: ${{ needs.read-pr-config.outputs.submission-main }}
     steps:
       - name: Checkout
@@ -57,15 +60,17 @@ jobs:
       - name: Install ivcurves requirements
         run: pip3 install -r requirements.txt
       - name: Install submission requirements
-        run: pip3 install -r ./${{ env.CONTRIBUTOR }}/requirements.txt
+        working-directory: ./${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_PATH }}
+        run: pip3 install -r requirements.txt
       - name: Run submission
-        run: python3 ./${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_MAIN }}
+        working-directory: ./${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_PATH }}
+        run: python3 ${{ env.SUBMISSION_MAIN }}
       - name: Run scorer
-        run: python3 ./compare_curves.py ./${{ env.CONTRIBUTOR }}/
-               --csv-output-path ./${{ env.CONTRIBUTOR }}/
+        run: python3 compare_curves.py ${{ env.CONTRIBUTOR }}
+               --csv-output-path ${{ env.CONTRIBUTOR }}
       - name: Save scores to artifacts
         uses: actions/upload-artifact@v3
         with:
           name: overall_scores.csv
-          path: ./${{ env.CONTRIBUTOR }}/overall_scores.csv
+          path: ${{ env.CONTRIBUTOR }}/overall_scores.csv
 
