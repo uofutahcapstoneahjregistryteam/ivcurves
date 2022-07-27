@@ -60,17 +60,17 @@ jobs:
       - name: Install ivcurves requirements
         run: pip3 install -r requirements.txt
       - name: Install submission requirements
-        working-directory: ./${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_PATH }}
+        working-directory: submissions/${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_PATH }}
         run: pip3 install -r requirements.txt
       - name: Run submission
-        working-directory: ./${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_PATH }}
+        working-directory: submissions/${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_PATH }}
         run: python3 ${{ env.SUBMISSION_MAIN }}
       - name: Run scorer
-        run: python3 compare_curves.py ${{ env.CONTRIBUTOR }}
-               --csv-output-path ${{ env.CONTRIBUTOR }}
+        run: python3 compare_curves.py submissions/${{ env.CONTRIBUTOR }}
+               --csv-output-path submissions/${{ env.CONTRIBUTOR }}
       - name: Save scores to artifacts
         uses: actions/upload-artifact@v3
         with:
           name: overall_scores.csv
-          path: ${{ env.CONTRIBUTOR }}/overall_scores.csv
+          path: submissions/${{ env.CONTRIBUTOR }}/overall_scores.csv
 
