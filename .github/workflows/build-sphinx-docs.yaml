@@ -17,6 +17,10 @@ jobs:
         with:
           ref: main
           path: main
+      - name: debug
+        run: |
+          pwd
+          ls
       - name: Install Python 3.10
         uses: actions/setup-python@v4
         with:
@@ -24,19 +28,19 @@ jobs:
       - name: Install ivcurves requirements
         run: pip3 install -r requirements.txt
       - name: Install Sphinx docs requirements
-        working-directory: docs/sphinx
+        working-directory: main/docs/sphinx
         run: |
           pip3 install -U sphinx
           pip3 install -r requirements.txt
       - name: Generate Sphinx docs test case images
-        working-directory: docs/sphinx/source
+        working-directory: main/docs/sphinx/source
         run: |
           mkdir -p _static
           mkdir -p _images
           mkdir -p _images/test_cases
           python3 ../../../precise.py --save-images _images/test_cases
       - name: Rebuild Sphinx docs html
-        working-directory: docs/sphinx
+        working-directory: main/docs/sphinx
         run: make html
       - name: Checkout gh-pages branch
         uses: actions/checkout@v3
