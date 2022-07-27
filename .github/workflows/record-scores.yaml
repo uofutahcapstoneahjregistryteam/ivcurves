@@ -38,6 +38,10 @@ jobs:
                --repo-owner ${{ github.repository_owner }}
                --overall-scores-path overall_scores.csv
                --database-path scores_database.json
+      - name: Install Sphinx docs requirements
+        run: |
+          pip3 install -U sphinx
+          pip3 install -r requirements.txt
       - name: Rebuild Sphinx docs
         working-directory: docs/sphinx
         run: |
