@@ -43,13 +43,20 @@ jobs:
         run: |
           pip3 install -U sphinx
           pip3 install -r requirements.txt
-      - name: Rebuild Sphinx docs
+      - name: Generate Sphinx docs test case images
+        working-directory: docs/sphinx/source
+        run: |
+          mkdir -p _static
+          mkdir -p _images
+          mkdir -p _images/test_cases
+          python3 ../../precise.py --save-images _images/test_cases
+      - name: Rebuild Sphinx docs html
         working-directory: docs/sphinx
         run: |
-          # python3 ../../precise.py --save-images ./_images/test_cases
           make html
-          git --version
           git config user.name "GitHub"
           git config user.email "github@ivcurves"
-          git status
+          git add build # The build html files
+          git commit -m 'Update Sphinx docs'
+          git push origin gh-pages # Make sure gh-pages branch exists in repo
 
