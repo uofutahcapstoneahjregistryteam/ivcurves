@@ -46,12 +46,13 @@ jobs:
           path: gh-pages
       - name: Copy Sphinx build to gh-pages
         run: |
-          cp -r main/docs/sphinx/build/html gh-pages/.
+          cp -r main/docs/sphinx/build/html/. gh-pages/.
       - name: Commit and push docs to gh-pages
         working-directory: gh-pages
         run: |
           git config user.name 'GitHub'
           git config user.email 'github@ivcurves'
-          git commit -am 'Update Sphinx docs'
+          git add -A .
+          git commit -m 'Update Sphinx docs'
           git push origin HEAD:gh-pages --force
 
