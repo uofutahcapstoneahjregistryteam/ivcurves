@@ -50,12 +50,15 @@ def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
         Each returned voltage, current pair is a solution to the single diode
         equation. Because we are working with inexact numbers, these pairs are
         rarely exact solutions to this equation. Here, an error of at most
-        `atol` means that for a given :math:`(V, I)` pair,
+        ``atol`` means that for a given :math:`(V, I)` pair,
 
         .. math:: 
 
-         atol > I_L - I_0 \left[ \exp \left( \frac{V+I R_s}{n N_s V_{th}}
-         \right) - 1 \right] - \frac{V + I R_s}{R_{sh}} - I. 
+           \left|
+              I_L - I_0 \left[
+                 \exp \left( \frac{V+I R_s}{n N_s V_{th}} \right) - 1
+              \right] - \frac{V + I R_s}{R_{sh}} - I
+           \right| < \text{atol}
 
     num_pts : int
         Number of points calculated on IV curve.
@@ -63,13 +66,13 @@ def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
     Returns
     -------
     (vv, precise_i) : tuple of numpy arrays
-        `vv` and `precise_i` are numpy arrays of mpmath floats of
-        length `num_pts`.
+        ``vv`` and ``precise_i`` are numpy arrays of mpmath floats of
+        length ``num_pts``.
 
     Notes
     -----
-    Uses pvlib.pvsystem.singlediode to generate solution pairs, then uses
-    max_power's `lambert_i_from_v` to sharpen the precision of the solutions
+    Uses ``pvlib.pvsystem.singlediode`` to generate solution pairs, then uses
+    :func:`max_power.lambert_i_from_v` to sharpen the precision of the solutions
     if necessary.
     """
     # convert mpf to np.float64
@@ -172,7 +175,8 @@ if __name__ == '__main__':
                         help='Saves the test set JSON at the given path')
     parser.add_argument('--save-images', dest='save_images_path', type=str,
                         help='saves the test set IV curve plots at the given path')
-    parser.add_argument('--plot', action=argparse.BooleanOptionalAction)
+    parser.add_argument('--plot', action=argparse.BooleanOptionalAction,
+                        help="Plot each test set's IV curves")
     args = parser.parse_args()
 
     if args.test_set_name:

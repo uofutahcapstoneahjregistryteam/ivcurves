@@ -44,7 +44,7 @@ def max_power_pt_finder(il, io, rs, rsh, n, vth, ns, atol):
         Number of cells in series :math:`N_s`
 
     atol : float
-        The returned voltage will be at most `atol` from the voltage that
+        The returned voltage will be at most ``atol`` from the voltage that
         yields the true maximum power of the given IV curve.
 
     Returns
@@ -100,7 +100,7 @@ def max_power_pt_finder(il, io, rs, rsh, n, vth, ns, atol):
 def golden_search(l_endpt, r_endpt, func, atol, iterlimit, int_pt=tuple(), is_right_int_pt=False, num_iter=0):
     r"""
     Uses golden-section search to recursively find maximum of the given
-    function over the given interval, with at most `atol` error.
+    function over the given interval, with at most ``atol`` error.
 
     Parameters
     ----------
@@ -114,7 +114,7 @@ def golden_search(l_endpt, r_endpt, func, atol, iterlimit, int_pt=tuple(), is_ri
         Function we want to maximize (single-variable).
 
     atol : float 
-        The x-coordinate of the returned point will be at most `atol` from the
+        The x-coordinate of the returned point will be at most ``atol`` from the
         x-coordinate that produces the true maximum in the given interval.
 
     iterlimit : int
@@ -126,7 +126,7 @@ def golden_search(l_endpt, r_endpt, func, atol, iterlimit, int_pt=tuple(), is_ri
         empty tuple.
 
     is_right_int_pt : bool, optional
-        If `int_pt` is the right hand interior point, then True. If `int_pt` is
+        If ``int_pt`` is the right hand interior point, then True. If ``int_pt`` is
         given, this should also be passed in (default value is False).
 
     num_iter : int
@@ -136,18 +136,18 @@ def golden_search(l_endpt, r_endpt, func, atol, iterlimit, int_pt=tuple(), is_ri
     -------
     tuple of ints
         Coordinates of a point whose y-coordinate is a good approximation for
-        the true maximum, and whose x-coordinate is within `atol` of the
-        x-coordinate that yields the true maximum of `func` on the given
+        the true maximum, and whose x-coordinate is within ``atol`` of the
+        x-coordinate that yields the true maximum of ``func`` on the given
         interval.
 
     Notes
     -----
-    This is a recursive function. When using, `int_pt` and `is_right_int_pt`
-    and `num_iter` should not be passed; they are only passed when the function
+    This is a recursive function. When using, ``int_pt`` and ``is_right_int_pt``
+    and ``num_iter`` should not be passed; they are only passed when the function
     recurses.
 
     For more information on the algorithm (and calculating the interior points
-    in get_left_int_pt and get_right_int_pt), see
+    in :func:`get_left_int_pt` and :func:`get_right_int_pt`), see
     http://www.math.kent.edu/~reichel/courses/intr.num.comp.2/lecture16/lecture8.pdf.
     """
     # overflow ? FIXME
@@ -192,7 +192,7 @@ def get_left_int_pt(left_x_endpt, right_x_endpt, func):
     r"""
     Calculates the left interior point of the interval.
 
-    Auxiliary function for golden_search.
+    This is an auxiliary function for :func:`golden_search`.
 
     Parameters
     ----------
@@ -223,7 +223,7 @@ def get_right_int_pt(left_x_endpt, right_x_endpt, func):
     r"""
     Calculates the right interior point of the interval. 
 
-    Auxiliary function for golden_search.
+    This is an auxiliary function for :func:`golden_search`.
 
     Parameters
     ----------
@@ -300,7 +300,7 @@ def lambert_i_from_v(v, il, io, rs, rsh, n, vth, ns):
 
     Notes
     -----
-    See pvlib.singlediode for original function. This implemention differs only
+    See ``pvlib.pvsystem.singlediode`` for original function. This implemention differs only
     in that it does not accept Series as inputs and can take mpmath floats as
     inputs.
     """
@@ -358,7 +358,7 @@ def lambert_v_from_i(i, il, io, rs, rsh, n, vth, ns):
 
     Notes
     -----
-    See pvlib.singlediode for original function. This implemention differs only
+    See ``pvlib.pvsystem.singlediode`` for original function. This implemention differs only
     in that it does not accept Series as inputs and can take mpmath floats as
     inputs.
     """
@@ -378,12 +378,12 @@ def lambert_v_from_i(i, il, io, rs, rsh, n, vth, ns):
 ########
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     case_number = 1
     case_filename = f'test_sets/case{case_number}'
 
-    parameters = dict()
-    max_vals = dict()
+    parameters = {}
+    max_vals = {}
     constants = utils.constants()
     vth, atol = constants['vth'], constants['atol']
 

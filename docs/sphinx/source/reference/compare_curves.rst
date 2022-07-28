@@ -7,7 +7,6 @@ Compare Curves
    :toctree: generated/
 
    find_x_intersection
-   try_findroot
    get_guess_interval
    find_distance
    total_score
