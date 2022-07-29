@@ -333,9 +333,9 @@ def total_score(known_curve_params, fitted_curve_params, vth, num_pts, atol):
         new_current = precise.lambert_i_from_v(new_voltage, il, io, rs, rsh, n, vth, ns) # find current associated to new_voltage
 
         # if voltage, current pair not a precise enough solution to single diode equation, make more precise
-        dff = utils.diff_lhs_rhs(new_voltage, new_current, il, io, rs, rsh, n, vth, ns)
+        dff = precise.diff_lhs_rhs(new_voltage, new_current, il, io, rs, rsh, n, vth, ns)
         if abs(dff) > atol:
-            new_current = mp.findroot(lambda y : utils.diff_lhs_rhs(new_voltage, y, il, io, rs, rsh, n, vth, ns), new_current, tol=atol**2)
+            new_current = mp.findroot(lambda y : precise.diff_lhs_rhs(new_voltage, y, il, io, rs, rsh, n, vth, ns), new_current, tol=atol**2)
 
         # calculate distance between these points, and add to score
         score += find_distance(new_voltage, new_current, v, i)
