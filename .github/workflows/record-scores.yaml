@@ -20,6 +20,7 @@ jobs:
           export ARTIFACTS_DATA=$(python3 -c '
           import requests
           res = requests.get("https://api.github.com/repos/reepoi/ivcurves/actions/runs/${{ github.event.workflow_run.id }}/artifacts")
+          print(res.json())
           print(res.json()["total_count"] > 0)
           ')
           echo ${{ env.ARTIFACTS_DATA }}
