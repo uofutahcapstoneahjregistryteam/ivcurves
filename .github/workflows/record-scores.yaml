@@ -18,7 +18,7 @@ jobs:
         run: |
           export ARTIFACTS_DATA=$(curl -s 'https://api.github.com/repos/reepoi/ivcurves/actions/runs/${{ github.event.workflow_run.id }}/artifacts')
           echo ${{ env.ARTIFACTS_DATA }}
-          echo '::set-output name=total-artifacts-count::${{ fromJSON(env.ARTIFACTS_DATA).total_count }}'
+          # echo '::set-output name=total-artifacts-count::${{ fromJSON(env.ARTIFACTS_DATA).total_count }}'
 
   record-scores:
     name: Record scores
