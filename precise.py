@@ -570,7 +570,7 @@ def plot_iv_curves(test_set_filename, case_parameter_sets, vth, atol, num_pts,
         v_vals, i_vals = get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts)
         plt.plot(v_vals, i_vals)
         if savefig:
-            plt.savefig(utils.make_iv_curve_name(test_set_name, idx),
+            plt.savefig(utils.make_iv_curve_name(test_set_filename, idx),
                         bbox_inches='tight')
         if not stack_plots:
             plt.cla()
@@ -642,9 +642,9 @@ def get_argparser():
         description='Generates precise IV curve data from the parameters of '
                     'the single diode equation.'
     )
-    parser.add_argument('--test-set', dest='test_set_name', type=str,
-                        help='Name of the test set to generate curves for.'
-                             'If omitted, all test sets are used.')
+    parser.add_argument('--test-set', dest='test_set_filename', type=str,
+                        help='Test set filename (excluding file extension) to '
+                             'generate curves for. If omitted, all test sets are used.')
     parser.add_argument('--save-json', dest='save_json_path', type=str,
                         help='Saves the test set JSON at the given path.')
     parser.add_argument('--save-images', dest='save_images_path', type=str,
@@ -657,15 +657,15 @@ def get_argparser():
 if __name__ == '__main__':
     args = get_argparser().parse_args()
 
-    if args.test_set_name:
-        test_set_names = [test_set_name]
+    if args.test_set_filename:
+        test_set_filenames = [test_set_filename]
     else:
-        test_set_names = utils.get_filenames_in_directory(utils.TEST_SETS_DIR)
+        test_set_filenames = utils.get_filenames_in_directory(utils.TEST_SETS_DIR)
 
     constants = utils.constants()
     vth, temp_cell, atol, num_pts = (constants['vth'], constants['temp_cell'],
                                      constants['atol'], constants['num_pts'])
-    for name in test_set_names:
+    for name in test_set_filenames:
         case_parameter_sets = utils.read_iv_curve_parameter_sets(f'{utils.TEST_SETS_DIR}/{name}')
         if args.save_json_path:
             write_test_set_json(f'{args.save_json_path}/{name}', case_parameter_sets, vth, temp_cell, atol, num_pts)
