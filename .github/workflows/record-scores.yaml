@@ -24,8 +24,8 @@ jobs:
         working-directory: .github/workflows/utils
         run: |
           pip3 install requests==2.28.1
-          python3 artifact_count.py --url 'https://api.github.com/repos/reepoi/ivcurves/actions/runs/${{ github.event.workflow_run.id }}/artifacts'
-          export ARTIFACTS_DATA=$(python3 artifact_count.py --url 'https://api.github.com/repos/reepoi/ivcurves/actions/runs/${{ github.event.workflow_run.id }}/artifacts')
+          python3 artifact_count.py 'https://api.github.com/repos/reepoi/ivcurves/actions/runs/${{ github.event.workflow_run.id }}/artifacts'
+          export ARTIFACTS_DATA=$(python3 artifact_count.py 'https://api.github.com/repos/reepoi/ivcurves/actions/runs/${{ github.event.workflow_run.id }}/artifacts')
           echo ${{ env.ARTIFACTS_DATA }}
           echo '::set-output name=has-artifacts::${{ env.ARTIFACTS_DATA }}'
 
