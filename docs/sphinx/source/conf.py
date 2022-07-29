@@ -41,7 +41,8 @@ extensions = [
     'sphinx.ext.extlinks',
     'sphinx.ext.napoleon',
     'sphinx.ext.githubpages',
-    'sphinxcontrib.datatemplates'
+    'sphinxcontrib.datatemplates',
+    'sphinxcontrib.autoprogram'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -96,6 +97,7 @@ extlinks = {
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
+    'pvlib': ('https://pvlib-python.readthedocs.io/en/stable/', None),
     'python': ('https://docs.python.org/3/', None),
     'numpy': ('https://numpy.org/doc/stable/', None),
     'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None),

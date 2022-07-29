@@ -6,7 +6,7 @@ Leaderboard
 .. datatemplate:nodata::
 
    {{ make_list_table_from_mappings([
-         ('Rank', 'Index'),
+         ('Rank', 'rank'),
          ('Pull Request', 'pr_number'),
          ('Username', 'username'),
          ('Overall Score', 'overall_score'),

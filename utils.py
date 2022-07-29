@@ -11,10 +11,25 @@ IV_PARAMETER_NAMES = ['photocurrent', 'saturation_current',
 
 
 def set_globals():
+    r"""
+    Sets library parameters that must be the same whenever the libraries are
+    imported.
+
+    ivcurves scripts should import these libraries from this script's
+    namespace to use these library parameter settings.
+
+    The following are set:
+
+    - ``mpmath``: The precision of calculations (``mp.dps``) is set to 40
+      decimal places.
+    """
     mp.dps = 40 # set precision, 16*2 rounded up
 
 
 def constants():
+    r"""
+    Commonly used constants of the ivcurves scripts.
+    """
     num_pts = 100
     precision = 16
     atol = mp.mpmathify(1e-16)
@@ -41,7 +56,7 @@ def mp_num_digits_left_of_decimal(num_mpf):
     Returns
     -------
     int
-        The number of digits to the left of the decimal point of `num_mpf`,
+        The number of digits to the left of the decimal point of ``num_mpf``,
         ignoring leading zeros.
     """
     if abs(num_mpf) < 1:
@@ -68,8 +83,8 @@ def mp_nstr_precision_func(num_mpf):
 
     Returns
     -------
-    string
-        A string representation of `num_mpf` with 16 siginigcant digits
+    str
+        A string representation of ``num_mpf`` with 16 significant digits
         after the decimal place.
     """
     precision = constants()['precision']
@@ -79,41 +94,41 @@ def mp_nstr_precision_func(num_mpf):
 
 def read_iv_curve_parameter_sets(filename):
     r"""
-    Returns a 2-D list of entries in a CSV file with these column names:
+    Returns a dictionary of indices to a list of these values:
     Index, photocurrent, saturation_current, resistance_series,
     resistance_shunt, n, and cells_in_series.
+    The indices and values are read from the CSV file at ``filename``.
 
     Parameters
     ----------
-    filename : string
-        The path to the CSV file excluding the file extension.
+    filename : str
+        The path to a CSV file with these column names:
+        Index, photocurrent, saturation_current, resistance_series,
+        resistance_shunt, n, and cells_in_series.
+        The path must exclude the file extension.
 
     Returns
     -------
-    2-D list
-        The 2-D list stores every value in the CSV file as a mpmath float,
-        except values in the Index column which are stored as integers.
+    dict
     """
     with open(f'{filename}.csv', newline='') as file:
         reader = csv.DictReader(file, delimiter=',')
-        rows = []
+        mapping = {}
         for row in reader:
-            rows.append(
-                [int(row['Index'])]
-                + [mp.mpmathify(row[col], strings=True)
-                    for col in IV_PARAMETER_NAMES]
-            )
-        return rows
+            mapping[int(row['Index'])] = [mp.mpmathify(row[col])
+                                            for col in IV_PARAMETER_NAMES]
+        return mapping
 
 
 def make_iv_curve_name(test_set_name, index):
     r"""
     Returns a unique name for an IV curve created from parameters of
-    a test set's test case.
+    a test set's test case. The unique name is of the form
+    ``'{test_set_name}_case_{index}'``.
 
     Parameters
     ----------
-    test_set_name : string
+    test_set_name : str
         The name of the test set that contains the test case of the IV curve's
         parameters.
 
@@ -122,7 +137,7 @@ def make_iv_curve_name(test_set_name, index):
 
     Returns
     -------
-    string
+    str
         A unique name for the IV curve.
     """
     return f'{test_set_name}_case_{index}'
@@ -130,7 +145,7 @@ def make_iv_curve_name(test_set_name, index):
 
 def get_filenames_in_directory(directory_path):
     """
-    Returns a set of filenames in the directory `directory_path`.
+    Returns a set of filenames in the directory ``directory_path``.
     The filenames do not have file extensions.
 
     Returns
@@ -139,55 +154,6 @@ def get_filenames_in_directory(directory_path):
         A set of filenames without file extensions.
     """
     return {entry.stem for entry in pathlib.Path(directory_path).iterdir()}
-
-
-def diff_lhs_rhs(v, i, il, io, rs, rsh, n, vth, ns):
-    r"""
-    Calculates the difference between the left hand side and right hand side of
-    the single diode equation.
-
-    Parameters
-    ----------
-    v : numeric
-        Voltage [V]
-
-    i : numeric
-        Current [A]
-
-    il : numeric
-        Light-generated current :math:`I_L` (photocurrent) [A]
-
-    io : numeric
-        Diode saturation :math:`I_0` current under desired IV curve conditions.
-        [A]
-
-    rs : numeric
-        Series resistance :math:`R_s` under desired IV curve conditions. [ohm]
-
-    rsh : numeric
-        Shunt resistance :math:`R_{sh}` under desired IV curve conditions.
-        [ohm]
-
-    n : numeric
-        Diode ideality factor :math:`n`
-
-    vth : numeric
-        Thermal voltage of the cell :math:`V_{th}` [V]
-        The thermal voltage of the cell (in volts) may be calculated as
-        :math:`k_B T_c / q`, where :math:`k_B` is Boltzmann's constant (J/K),
-        :math:`T_c` is the temperature of the p-n junction in Kelvin, and
-        :math:`q` is the charge of an electron (coulombs). 
-
-    ns : numeric
-        Number of cells in series :math:`N_s`
-
-    Returns
-    -------
-    mpmath float
-        Difference between the left hand and right hand sides of the single
-        diode equation.
-    """
-    return (il - io*mp.expm1((v + i*rs)/(n*ns*vth)) - (v + i*rs)/(rsh) - i)
 
 
 set_globals()

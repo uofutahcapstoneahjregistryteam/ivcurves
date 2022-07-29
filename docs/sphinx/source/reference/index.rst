@@ -5,6 +5,6 @@ IV Curves
    :maxdepth: 2
 
    compare_curves
-   max_power
    precise
+   utils
 

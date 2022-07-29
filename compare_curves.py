@@ -1,5 +1,4 @@
 import argparse
-import os
 import csv
 import pvlib
 import matplotlib.pyplot as plt
@@ -7,7 +6,6 @@ import matplotlib.pyplot as plt
 # from ivcurves repo
 import utils
 from utils import mp
-import max_power
 import precise
 
 
@@ -332,7 +330,7 @@ def total_score(known_curve_params, fitted_curve_params, vth, num_pts, atol):
         # for each point (`v`, `i`) on the fitted curve, find the associated
         # point on known curve (`new_voltage`, `new_current`)
         new_voltage = find_x_intersection(single_diode, known_xs, known_ys, v, i, num_pts, atol)
-        new_current = max_power.lambert_i_from_v(new_voltage, il, io, rs, rsh, n, vth, ns) # find current associated to new_voltage
+        new_current = precise.lambert_i_from_v(new_voltage, il, io, rs, rsh, n, vth, ns) # find current associated to new_voltage
 
         # if voltage, current pair not a precise enough solution to single diode equation, make more precise
         dff = utils.diff_lhs_rhs(new_voltage, new_current, il, io, rs, rsh, n, vth, ns)
@@ -391,15 +389,15 @@ def get_curve(curve_parameters, vth, num_pts, atol):
         Number of points to calculate on the given curve.
 
     atol : float
-        The error of each of the solution pairs found is at most `atol`. (See
-        :func:`precise.get_precise_i`.)
-        Each solution pair is a point on the curve.
+        The error of each of the solution pairs found is at most ``atol``.
+        (See :func:`precise.get_precise_i`.) Each solution pair is a point
+        on the curve.
 
     Returns
     -------
     (vv, ii) : tuple of numpy arrays
-        `vv` is a numpy array of float64 and `ii` is a numpy array of mpmath
-        floats. Each array has `num_pts` entries.
+        ``vv`` is a numpy array of float64 and ``ii`` is a numpy array of
+        mpmath floats. Each array has ``num_pts`` entries.
     """
     il, io, rs, rsh, n, ns = curve_parameters
     vv, ii = precise.get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts)
@@ -488,9 +486,9 @@ def iv_plotter(iv_known, iv_fitted, vth, num_pts, atol, pts=None, plot_lines=Tru
     -------
     plot
         A matplotlib plot of the known curve (cyan) and the fitted curve
-        (green). If `pts` is given, the image will also include points that
+        (green). If ``pts`` is given, the image will also include points that
         were compared on the fitted curve (light green) and the known curve
-        (magenta). If `plot_lines` is True, then lines are drawn that connect
+        (magenta). If ``plot_lines`` is True, then lines are drawn that connect
         the associated points.
     """
     if not pts:
@@ -518,7 +516,7 @@ def iv_plotter(iv_known, iv_fitted, vth, num_pts, atol, pts=None, plot_lines=Tru
         # get intersection point on known curve
         try: 
             new_voltage = find_x_intersection(single_diode, known_xs, known_ys, vp, ip, num_pts, atol)
-            new_current = max_power.lambert_i_from_v(new_voltage, il, io, rs, rsh, n, vth, ns)
+            new_current = precise.lambert_i_from_v(new_voltage, il, io, rs, rsh, n, vth, ns)
         except:
             print("BAD PT @", count)
             count += 1
@@ -541,7 +539,26 @@ def iv_plotter(iv_known, iv_fitted, vth, num_pts, atol, pts=None, plot_lines=Tru
     return plot
 
 
-def get_test_sets_to_score(fitted_files_directory, test_set):
+def get_test_sets_to_score(fitted_files_directory, test_set=''):
+    """
+    Returns a list of valid test set filenames (excluding file extensions)
+    based on the files found in ``fitted_files_directory``.
+
+    Parameters
+    ----------
+    fitted_files_directory : str
+        Directory that contains files whose filenames are test set filenames.
+
+    test_set : str, default ''
+        A singular test set filename to look for in ``fitted_files_directory``.
+        The file extension must be excluded. This argument is ignored by
+        default.
+
+    Returns
+    -------
+    list
+        A list of valid test set filenames (excluding file extensions).
+    """
     test_set_names = utils.get_filenames_in_directory(utils.TEST_SETS_DIR)
     test_sets_to_score = []
     if test_set:
@@ -558,6 +575,18 @@ def get_test_sets_to_score(fitted_files_directory, test_set):
 
 
 def write_test_set_score_per_curve_csvs(scores, csv_output_path):
+    """
+    Writes a CSV file containing a score for each test case in every test set.
+
+    Parameters
+    ----------
+    scores : dict
+        Dictionary of test set filenames (excluding file extensions) to a
+        dictionary to test case indices to test case scores.
+
+    csv_output_path : str
+        Directory where the CSV files will be writen.
+    """
     csv_columns = ['Index', 'score']
     nstr = utils.mp_nstr_precision_func
     for name, cases in scores.items():
@@ -569,6 +598,19 @@ def write_test_set_score_per_curve_csvs(scores, csv_output_path):
 
 
 def write_overall_scores_csv(scores, csv_output_path):
+    """
+    Writes a CSV file containing overall scores for each test set.
+    An overall score is a sum of the test case scores.
+
+    Parameters
+    ----------
+    scores : dict
+        Dictionary of test set filenames (excluding file extensions) to a
+        dictionary to test case indices to test case scores.
+
+    csv_output_path : str
+        Directory where the CSV files will be writen.
+    """
     csv_columns = ['test_set', 'score']
     nstr = utils.mp_nstr_precision_func
     with open(f'{csv_output_path}/overall_scores.csv', 'w') as file:
@@ -579,21 +621,28 @@ def write_overall_scores_csv(scores, csv_output_path):
             writer.writerow([name, nstr(test_set_score_sum)])
 
 
+def get_argparser():
+    parser = argparse.ArgumentParser(
+        description='Measure the distance between IV curves generated from '
+                    'the parameters of the single diode equation.'
+    )
+    parser.add_argument('fitted_files_directory', type=str,
+                        help='Directory containing fitted parameter CSV files.')
+    parser.add_argument('--test-set', dest='test_set', type=str, default='',
+                        help='Name of test set to score.')
+    parser.add_argument('--csv-output-path', dest='csv_output_path', type=str,
+                        default='.', help='Directory where to write output CSV files.')
+    parser.add_argument('--plot', action=argparse.BooleanOptionalAction,
+                        help='Plot each IV curve fit.')
+    return parser
+
+
 ######## 
 # MAIN #
 ######## 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('fitted_files_directory', type=str,
-                        help='directory containing fitted parameter CSV files')
-    parser.add_argument('--test-set', dest='test_set', type=str, default='',
-                        help='name of test set to score')
-    parser.add_argument('--csv-output-path', dest='csv_output_path', type=str,
-                        default='.', help='where to write output CSV files')
-    parser.add_argument('--plot', action=argparse.BooleanOptionalAction,
-                        help='Plot each IV curve fit')
-    args = parser.parse_args()
+    args = get_argparser().parse_args()
 
     # # intersecting curves example
     # iv_known = list(map(mp.mpmathify, [6.0, 3.8500023e-06, 1.6816000000000002, 8832.800000000005, 1.4200000000000004, 72]))
@@ -610,10 +659,9 @@ if __name__ == '__main__':
         scores[name] = {}
         known_parameter_sets = utils.read_iv_curve_parameter_sets(f'{utils.TEST_SETS_DIR}/{name}')
         fitted_parameter_sets = utils.read_iv_curve_parameter_sets(f'{args.fitted_files_directory}/{name}')
-        known_parameter_sets.sort(key=lambda l: l[0])
-        fitted_parameter_sets.sort(key=lambda l: l[0])
-        for (_, *known_p), (_, *fitted_p) in zip(known_parameter_sets, fitted_parameter_sets, strict=True):
-            scores[name][known_p[0]] = total_score(known_p, fitted_p, vth, num_compare_pts, atol)
+        for idx, known_p in known_parameter_sets.items():
+            fitted_p = fitted_parameter_sets[idx]
+            scores[name][idx] = total_score(known_p, fitted_p, vth, num_compare_pts, atol)
 
             if args.plot:
                 fit_xs, fit_ys = get_curve(fitted_p, vth, num_compare_pts, atol)
