@@ -1,5 +1,5 @@
 """
-Wrapper of utils.py from used in the ivcurves scripts
+Wrapper of utils.py that is used in the ivcurves scripts
 Allows useful functions in utils.py to be used by the Sphinx docs scripts.
 """
 import os
