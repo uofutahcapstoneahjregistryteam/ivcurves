@@ -92,7 +92,7 @@ def validate_overall_scores(overall_scores):
     overall_scores_keys = set(overall_scores.keys())
 
     # Check special test set filenames first
-    if ScorerCode.NO_SCORES in overall_scores_keys:
+    if ScorerCode.NO_SCORES.value in overall_scores_keys:
         return ScorerCode.NO_SCORES
 
     # Proceed with normal validation
