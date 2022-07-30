@@ -44,7 +44,7 @@ jobs:
         run: |
           echo '::set-output name=contributor::${{ env.CONTRIBUTOR }}'
           echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
-          echo '::set-output name=submission-main::${{ env.REQUIREMENTS }}'
+          echo '::set-output name=requirements::${{ env.REQUIREMENTS }}'
           echo '::set-output name=submission-main::${{ env.SUBMISSION_MAIN }}'
 
   run-scorer:
