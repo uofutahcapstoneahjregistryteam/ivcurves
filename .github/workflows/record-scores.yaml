@@ -39,6 +39,8 @@ jobs:
           git config user.name 'GitHub'
           git config user.email 'github@ivcurves'
           git add scores_database.json
-          git commit -m 'Update scores database'
-          git push origin main
+          if git diff-index --quiet HEAD; then
+            git commit -m 'Update scores database'
+            git push origin main
+          fi
 
