@@ -6,6 +6,10 @@ on:
     types:
       - closed
 
+env:
+  PR_NUMBER: ${{ github.event.pull_request.number }}
+  PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+
 jobs:
   read-pr-config:
     name: Read pull request config
@@ -23,8 +27,9 @@ jobs:
         uses: dawidd6/action-download-artifact@v2.21.1
         with:
           workflow: score-submission.yaml
-          pr: ${{ github.event.pull_request.number }}
+          pr: ${{ env.PR_NUMBER }}
           name: pr_config.json
+          path: submissions/${{ env.PR_AUTHOR }}
       - name: Set pr_config.json entries as environment variables
         run: python3 .github/workflows/utils/print_json_as_env.py
                submissions/${{ env.CONTRIBUTOR }}/pr_config.json
@@ -51,12 +56,12 @@ jobs:
         uses: dawidd6/action-download-artifact@v2.21.1
         with:
           workflow: score-submission.yaml
-          pr: ${{ github.event.pull_request.number }}
+          pr: ${{ env.PR_NUMBER }}
           name: overall_scores.csv
       - name: Validate and record scores
         run: python3 .github/workflows/utils/record_scores.py
-               --pr-author ${{ github.event.pull_request.user.login }}
-               --pr-number ${{ github.event.pull_request.number }}
+               --pr-author ${{ env.PR_AUTHOR }}
+               --pr-number ${{ env.PR_NUMBER }}
                --pr-closed-at ${{ github.event.pull_request.closed_at }}
                --overall-scores-path overall_scores.csv
                --database-path scores_database.json
