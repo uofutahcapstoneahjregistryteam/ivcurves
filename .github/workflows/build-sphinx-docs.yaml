@@ -2,10 +2,7 @@ name: Build Sphinx docs
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: [Record scores]
-    types:
-      - completed
+  workflow_call:
 
 jobs:
   build-sphinx-docs:

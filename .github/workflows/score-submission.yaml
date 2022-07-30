@@ -27,12 +27,14 @@ jobs:
         id: save-github-actor
         if: ${{ steps.save-pr-author.outputs.contributor == '' }}
         run: echo '::set-output name=contributor::${{ github.actor }}'
-      - name: Set the contributor environment
+      - name: Set the contributor environment variable
         env:
           CONTRIBUTOR: ${{ join(steps.*.outputs.contributor, '') }}
-        run: |
-          echo 'CONTRIBUTOR=${{ env.CONTRIBUTOR }}' >> ${{ github.env }}
-          cat submissions/${{ env.CONTRIBUTOR }}/pr_config.env >> ${{ github.env }}
+        run: echo 'CONTRIBUTOR=${{ env.CONTRIBUTOR }}' >> ${{ github.env }}
+      - name: Set pr_config.json entries as environment variables
+        run: python3 .github/workflows/utils/print_json_as_env.py
+               submissions/${{ env.CONTRIBUTOR }}/pr_config.json
+               --validate-pr-config >> ${{ github.env }}
       - name: Save scorer environment to job output
         id: save-env
         run: |
@@ -40,22 +42,6 @@ jobs:
           echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
           echo '::set-output name=submission-main::${{ env.REQUIREMENTS }}'
           echo '::set-output name=submission-main::${{ env.SUBMISSION_MAIN }}'
-
-  cancel-scorer:
-    name: Cancel scorer
-    runs-on: ubuntu-latest
-    needs: read-pr-config
-    if: ${{ needs.read-pr-config.outputs.run-scorer == 'false' }}
-    steps:
-      - name: Write overall_scores.csv to encode that scorer was cancelled
-        run: |
-          echo 'test_set,score' > overall_scores.csv
-          echo '__no_scores__,None' >> overall_scores.csv
-      - name: Save scores to artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: overall_scores.csv
-          path: .
 
   run-scorer:
     name: Run scorer
@@ -76,14 +62,14 @@ jobs:
       - name: Install ivcurves requirements
         run: pip3 install -r requirements.txt
       - name: Install submission requirements
-        working-directory: submissions/${{ env.CONTRIBUTOR }}/${{ env.REQUIREMENTS }}
-        run: pip3 install -r requirements.txt
+        working-directory: submissions/${{ env.CONTRIBUTOR }}
+        run: pip3 install -r ${{ env.REQUIREMENTS }}
       - name: Run submission
-        working-directory: submissions/${{ env.CONTRIBUTOR }}/${{ env.REQUIREMENTS }}
+        working-directory: submissions/${{ env.CONTRIBUTOR }}
         run: python3 ${{ env.SUBMISSION_MAIN }}
       - name: Run scorer
-        run: python3 compare_curves.py submissions/${{ env.CONTRIBUTOR }}
-               --csv-output-path submissions/${{ env.CONTRIBUTOR }}
+        working-directory: submissions/${{ env.CONTRIBUTOR }}
+        run: python3 compare_curves.py . --csv-output-path .
       - name: Save scores to artifacts
         uses: actions/upload-artifact@v3
         with:

@@ -9,11 +9,6 @@ ROOT_DIR = pathlib.Path(f'{__file__}/../../../..').resolve()
 TEST_SETS_DIR = pathlib.Path(f'{ROOT_DIR}/test_sets')
 
 
-class ScorerCode(enum.Enum):
-    IS_SCORED = '' # the scorer ran and returns scores
-    NO_SCORES = '__no_scores__' # the scorer did not run
-
-
 def load_json(filename):
     with open(filename, 'r') as file:
         return json.load(file)
@@ -70,30 +65,13 @@ def validate_overall_scores(overall_scores):
 
     Otherwise, a ``ValueError`` is raised.
 
-    There are also special test set filename values of ``overall_scores`` that
-    will change the behavior and return value of this method.
-
-    These special values are:
-
-    - ``__no_scores__``: If this is present in the keys of ``overall_scores``,
-      this indicates that the scorer did not run. This occurs when
-      ``RUN_SCORER=false`` in ``pr_config.env``.
-
     Parameters
     ----------
     overall_scores : dict
         A dictionary from test set filenames (excluding file extensions) to
         strings representing scores.
-
-    Returns
-    -------
-    ScorerCodes
     """
     overall_scores_keys = set(overall_scores.keys())
-
-    # Check special test set filenames first
-    if ScorerCode.NO_SCORES.value in overall_scores_keys:
-        return ScorerCode.NO_SCORES
 
     # Proceed with normal validation
     valid_test_set_filenames = test_set_filenames()
@@ -107,9 +85,6 @@ def validate_overall_scores(overall_scores):
             float(score_str) # validate is a number
         except ValueError:
             raise ValueError("The score of test set '{name}' must parse to a float: {score_str}")
-
-    # validation passes normally
-    return ScorerCode.IS_SCORED
 
 
 def write_overall_scores_to_database(database, pr_number, pr_author, pr_closed_datetime, overall_scores):
@@ -175,9 +150,7 @@ if __name__ == '__main__':
 
     overall_scores = load_overall_scores(args.overall_scores_path)
     scorer_code = validate_overall_scores(overall_scores)
-
-    if scorer_code == ScorerCode.IS_SCORED:
-        database = load_json(args.database_path)
-        write_overall_scores_to_database(database, args.pr_number, args.pr_author, args.pr_closed_datetime, overall_scores)
-        save_json(database, f'{ROOT_DIR}/{args.database_path}')
+    database = load_json(args.database_path)
+    write_overall_scores_to_database(database, args.pr_number, args.pr_author, args.pr_closed_datetime, overall_scores)
+    save_json(database, f'{ROOT_DIR}/{args.database_path}')
 

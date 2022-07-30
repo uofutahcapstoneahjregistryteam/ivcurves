@@ -7,10 +7,37 @@ on:
       - closed
 
 jobs:
+  read-pr-config:
+    name: Read pull request config
+    runs-on: ubuntu-latest
+    outputs:
+      run-scorer: ${{ steps.save-env.outputs.run-scorer }} # Boolean to run the record-scores job
+    steps:
+      - name: Download pull request config from score-submission artifacts 
+        uses: dawidd6/action-download-artifact@v2.21.1
+        with:
+          workflow: score-submission.yaml
+          pr: ${{ github.event.pull_request.number }}
+          name: pr_config.json
+      - name: Checkout pull request target
+        uses: actions/checkout@v3
+      - name: Install Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Set pr_config.json entries as environment variables
+        run: python3 .github/workflows/utils/print_json_as_env.py
+               submissions/${{ env.CONTRIBUTOR }}/pr_config.json
+               --validate-pr-config >> ${{ github.env }}
+      - name: Save scorer environment to job output
+        id: save-env
+        run: echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
+
   record-scores:
     name: Record scores
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.merged == true && github.ref_type == 'branch' && github.ref_name == 'main' && github.repository_owner == 'reepoi' }}
+    needs: read-pr-config
+    if: ${{ needs.read-pr-config.outputs.run-scorer == 'true' && github.event.pull_request.merged == true && github.ref_type == 'branch' && github.ref_name == 'main' && github.repository_owner == 'reepoi' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -24,7 +51,6 @@ jobs:
         uses: dawidd6/action-download-artifact@v2.21.1
         with:
           workflow: score-submission.yaml
-          run_id: ${{ github.event.workflow_run.id }}
           pr: ${{ github.event.pull_request.number }}
           name: overall_scores.csv
       - name: Validate and record scores
@@ -35,6 +61,7 @@ jobs:
                --overall-scores-path overall_scores.csv
                --database-path scores_database.json
       - name: Commit and push scores database
+        id: commit-scores
         run: |
           git config user.name 'GitHub'
           git config user.email 'github@ivcurves'
@@ -45,4 +72,8 @@ jobs:
             git commit -m 'Update scores database'
             git push origin main
           fi
+          echo '::set-output name=update-docs::$DATABASE_CHANGED'
+      - name: If database was updated, build Sphinx docs
+        if: ${{ steps.commit-scores.update-docs == 1 }}
+        uses: .github/workflows/build-sphinx-docs.yaml
 

@@ -5,6 +5,7 @@ __pycache__
 !test_sets/*.csv
 !test_sets/*.json
 !scores_database.json
+!submissions/**/*.*
 
 docs/sphinx/build
 docs/sphinx/**/generated
