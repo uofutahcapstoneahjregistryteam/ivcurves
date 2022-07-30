@@ -32,7 +32,7 @@ jobs:
           path: submissions/${{ env.PR_AUTHOR }}
       - name: Set pr_config.json entries as environment variables
         run: python3 .github/workflows/utils/print_json_as_env.py
-               submissions/${{ env.CONTRIBUTOR }}/pr_config.json
+               submissions/${{ env.PR_AUTHOR }}/pr_config.json
                --validate-pr-config >> ${{ github.env }}
       - name: Save scorer environment to job output
         id: save-env
