@@ -46,6 +46,11 @@ jobs:
           echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
           echo '::set-output name=requirements::${{ env.REQUIREMENTS }}'
           echo '::set-output name=submission-main::${{ env.SUBMISSION_MAIN }}'
+      - name: Upload pr_config.json to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: pr_config.json
+          path: submissions/${{ env.CONTRIBUTOR }}/pr_config.json
 
   run-scorer:
     name: Run scorer
