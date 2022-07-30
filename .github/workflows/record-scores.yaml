@@ -39,7 +39,9 @@ jobs:
           git config user.name 'GitHub'
           git config user.email 'github@ivcurves'
           git add scores_database.json
-          if git diff-index --quiet HEAD; then
+          git diff-index --quiet HEAD # exit code 0 if no changes, 1 if changes
+          export DATABASE_CHANGED=$? # get exit code
+          if [[ $DATABASE_CHANGED ]]; then
             git commit -m 'Update scores database'
             git push origin main
           fi
