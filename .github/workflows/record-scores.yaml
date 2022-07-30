@@ -13,18 +13,18 @@ jobs:
     outputs:
       run-scorer: ${{ steps.save-env.outputs.run-scorer }} # Boolean to run the record-scores job
     steps:
-      - name: Download pull request config from score-submission artifacts 
-        uses: dawidd6/action-download-artifact@v2.21.1
-        with:
-          workflow: score-submission.yaml
-          pr: ${{ github.event.pull_request.number }}
-          name: pr_config.json
       - name: Checkout pull request target
         uses: actions/checkout@v3
       - name: Install Python 3.10
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+      - name: Download pull request config from score-submission artifacts 
+        uses: dawidd6/action-download-artifact@v2.21.1
+        with:
+          workflow: score-submission.yaml
+          pr: ${{ github.event.pull_request.number }}
+          name: pr_config.json
       - name: Set pr_config.json entries as environment variables
         run: python3 .github/workflows/utils/print_json_as_env.py
                submissions/${{ env.CONTRIBUTOR }}/pr_config.json

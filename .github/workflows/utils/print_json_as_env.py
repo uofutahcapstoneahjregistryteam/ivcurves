@@ -32,10 +32,9 @@ def validate_pr_config(pr_config_json):
     """
     pr_config_validated = {}
     json_bool = lambda bool_v: py_to_json_bool(bool(bool_v))
-    absolute_path = lambda path: pathlib.Path(path).resolve()
     valid_keys_to_value_types = {'RUN_SCORER': json_bool,
-                                 'REQUIREMENTS': absolute_path,
-                                 'SUBMISSION_MAIN': absolute_path}
+                                 'REQUIREMENTS': pathlib.Path,
+                                 'SUBMISSION_MAIN': pathlib.Path}
 
     for key, value_type in valid_keys_to_value_types.items():
         pr_config_validated[key] = value_type(pr_config_json[key])
