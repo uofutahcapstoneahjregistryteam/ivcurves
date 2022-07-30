@@ -45,7 +45,7 @@ jobs:
     name: Cancel scorer
     runs-on: ubuntu-latest
     needs: read-pr-config
-    if: ${{ needs.read-pr-config.outputs.run-scorer == false }}
+    if: ${{ needs.read-pr-config.outputs.run-scorer == 'false' }}
     steps:
       - name: Write overall_scores.csv to encode that scorer was cancelled
         run: |
@@ -60,7 +60,7 @@ jobs:
     name: Run scorer
     runs-on: ubuntu-latest
     needs: read-pr-config
-    if: ${{ needs.read-pr-config.outputs.run-scorer == true }}
+    if: ${{ needs.read-pr-config.outputs.run-scorer == 'true' }}
     env:
       CONTRIBUTOR: ${{ needs.read-pr-config.outputs.contributor }}
       REQUIREMENTS: ${{ needs.read-pr-config.outputs.requirements }}
