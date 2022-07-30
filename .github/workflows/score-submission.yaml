@@ -41,11 +41,26 @@ jobs:
           echo '::set-output name=submission-main::${{ env.REQUIREMENTS }}'
           echo '::set-output name=submission-main::${{ env.SUBMISSION_MAIN }}'
 
+  cancel-scorer:
+    name: Cancel scorer
+    runs-on: ubuntu-latest
+    needs: read-pr-config
+    if: ${{ needs.read-pr-config.outputs.run-scorer == false }}
+    steps:
+      - name: Write overall_scores.csv to encode that scorer was cancelled
+        run: |
+          echo 'test_set,score' > overall_scores.csv
+          echo '__no_scores__,None' >> overall_scores.csv
+      - name: Save scores to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: overall_scores.csv
+
   run-scorer:
     name: Run scorer
     runs-on: ubuntu-latest
     needs: read-pr-config
-    if: ${{ needs.read-pr-config.outputs.run-scorer }}
+    if: ${{ needs.read-pr-config.outputs.run-scorer == true }}
     env:
       CONTRIBUTOR: ${{ needs.read-pr-config.outputs.contributor }}
       REQUIREMENTS: ${{ needs.read-pr-config.outputs.requirements }}
