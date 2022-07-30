@@ -55,6 +55,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: overall_scores.csv
+          path: .
 
   run-scorer:
     name: Run scorer
