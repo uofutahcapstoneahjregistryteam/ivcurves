@@ -76,6 +76,6 @@ jobs:
           fi
           echo '::set-output name=update-docs::$DATABASE_CHANGED'
       - name: If database was updated, build Sphinx docs
-        if: ${{ steps.commit-scores.update-docs == '1' }}
+        if: ${{ steps.commit-scores.outputs.update-docs == '1' }}
         uses: ./.github/workflows/build-sphinx-docs.yaml
 
