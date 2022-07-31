@@ -69,18 +69,13 @@ jobs:
           git config user.name 'GitHub'
           git config user.email 'github@ivcurves'
           git add scores_database.json
-          echo $?
-          git status
-          echo $?
-          # DATABASE_CHANGED = 0 if no changes, 1 if changes
           export DATABASE_CHANGED=$(git diff-index --quiet HEAD; echo $?)
-          echo $DATABASE_CHANGED
           if [[ $DATABASE_CHANGED == 1 ]]; then
             git commit -m 'Update scores database'
             git push origin main
           fi
           echo '::set-output name=update-docs::$DATABASE_CHANGED'
       - name: If database was updated, build Sphinx docs
-        if: ${{ steps.commit-scores.update-docs == 1 }}
+        if: ${{ steps.commit-scores.update-docs == '1' }}
         uses: ./.github/workflows/build-sphinx-docs.yaml
 
