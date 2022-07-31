@@ -81,6 +81,8 @@ jobs:
           echo ${{ env.DATABASE_CHANGED }}
           pwd
           ls
+          test ../.././.github/workflows/build-sphinx-docs.yaml
+          echo $?
       - name: If database was updated, build Sphinx docs
         if: ${{ env.DATABASE_CHANGED == 1 }}
         uses: ./.github/workflows/build-sphinx-docs.yaml
