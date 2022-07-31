@@ -73,11 +73,11 @@ jobs:
           git add scores_database.json
           git diff-index --quiet HEAD # exit code 0 if no changes, 1 if changes
           export DATABASE_CHANGED=$? # get exit code
+          # echo '::set-output name=update-docs::$DATABASE_CHANGED'
           if [[ $DATABASE_CHANGED == 1 ]]; then
             git commit -m 'Update scores database'
             git push origin main
           fi
-          # echo '::set-output name=update-docs::$DATABASE_CHANGED'
       - name: If database was updated, build Sphinx docs
         if: ${{ steps.commit-scores.update-docs == 1 }}
         uses: ./.github/workflows/build-sphinx-docs.yaml
