@@ -1,5 +1,5 @@
 {
-    "RUN_SCORER": true,
+    "RUN_SCORER": false,
     "REQUIREMENTS": "requirements.txt",
     "SUBMISSION_MAIN": "solution.py"
 }
