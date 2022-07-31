@@ -76,7 +76,9 @@ jobs:
           fi
           echo DATABASE_CHANGED=$DATABASE_CHANGED >> ${{ github.env }}
       - name: debug
-        run: echo ${{ env.DATABASE_CHANGED }}
+        run: |
+          echo ${{ env.DATABASE_CHANGED }}
+          ls ./.github/workflows
       - name: If database was updated, build Sphinx docs
         if: ${{ env.DATABASE_CHANGED == 1 }}
         uses: ./.github/workflows/build-sphinx-docs.yaml
