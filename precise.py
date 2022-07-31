@@ -565,7 +565,6 @@ def plot_iv_curves(test_set_filename, case_parameter_sets, vth, atol, num_pts,
     plt.style.use('seaborn-darkgrid')
     plt.xlabel('Voltage')
     plt.ylabel('Current')
-    plt.title(test_set_filename)
     for idx, (il, io, rs, rsh, n, ns) in case_parameter_sets.items():
         v_vals, i_vals = get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts)
         plt.plot(v_vals, i_vals)

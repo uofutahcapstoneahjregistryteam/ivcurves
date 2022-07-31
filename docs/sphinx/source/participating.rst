@@ -14,15 +14,19 @@ You may as many submissions as you like, and each will be a separate entry on th
 #. Create a new folder ``submissions/<your_GitHub_username>``.
    This folder will store all of the files you create.
 #. Write or copy your submission's code inside this folder.
-#. Create a file ``pr_config.env`` with these three lines:
+#. Create a file ``pr_config.json`` with three entries:
    
-   .. code-block:: bash
+   .. code-block:: json
 
-      RUN_SCORER=true
-      REQUIREMENTS='<path_to_requirements.txt>'
-      SUBMISSION_MAIN='<path_to_submission_entrypoint>'
+      {
+          "RUN_SCORER": true,
+          "REQUIREMENTS": "<path_to_requirements.txt>",
+          "SUBMISSION_MAIN": "<path_to_submission_entrypoint.py>"
+      }
 
-#. Push these changes to your fork.
+   The paths of ``REQUIREMENTS`` and ``SUBMISSION_MAIN`` must be relative to your ``submissions/<your_GitHub_username>`` folder.
+   For example, for a Pip requirements file located at ``submissions/<your_GitHub_username>/requirements.txt``, the path of ``REQUIREMENTS`` should be ``./requirements.txt``.
+#. Push your changes to your fork.
    GitHub will automatically run your code and provide a CSV file containing your scores.
    You will see either a green check mark or red x next to your commit.
    Click on it to see your results.
@@ -31,6 +35,9 @@ You may as many submissions as you like, and each will be a separate entry on th
    An ivcurves maintainer will be notified of your pull request.
 #. After an ivcurves maintainer reviews and approves your pull request, it will be merged.
    GitHub will record your score in its database, and post it to the leaderboard.
+
+Submission Workflow Diagram
+---------------------------
 
 .. mermaid::
 
@@ -42,21 +49,21 @@ You may as many submissions as you like, and each will be a separate entry on th
        activate Competitor
        Note over Competitor: Forks ivcurves repository.
        Note over Competitor: Creates folder submissions/<your_GitHub_username> to put their files into.
-       Note over Competitor: Creates pr_config.env with these three lines:<br> RUN_SCORER=true<br>REQUIREMENTS='<path_to_requirements.txt>'<br> SUBMISSION_MAIN='<path_to_submission_entrypoint>'
+       Note over Competitor: Creates pr_config.json.
        Note over Competitor: Writes code for submission.
 
        Competitor->>GitHub Actions: Pushes code to fork on GitHub
        deactivate Competitor
        activate GitHub Actions
-       Note over GitHub Actions: Reads pr_config.env and scores submission.
+       Note over GitHub Actions: Reads pr_config.json and scores submission.
        GitHub Actions->>Competitor: Reports results with CSV of scores
        deactivate GitHub Actions
 
        Competitor->>GitHub Actions: Creates pull request
        activate GitHub Actions
-       GitHub Actions->>ivcurves Maintainer: Notifies of pull requeset
+       GitHub Actions->>ivcurves Maintainer: Notifies of pull request
        activate ivcurves Maintainer
-       Note over GitHub Actions: Reads pr_config.env and score submission code.
+       Note over GitHub Actions: Reads pr_config.json and scores submission code.
        GitHub Actions->>Competitor: Reports results with CSV of scores
        Note over ivcurves Maintainer: Reviews pull request.
        ivcurves Maintainer->>GitHub Actions: Merges competitor's pull request

@@ -49,7 +49,7 @@ def print_json_as_env(flat_json):
 
 def get_argparser():
     parser = argparse.ArgumentParser(
-        description='Prints entires in flat JSON object like environment variables.'
+        description='Prints entries in flat JSON object like environment variables.'
     )
     parser.add_argument('path', type=str, help='Path to the JSON file')
     parser.add_argument('--validate-pr-config', action=argparse.BooleanOptionalAction,
