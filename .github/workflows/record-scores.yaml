@@ -77,7 +77,7 @@ jobs:
             git commit -m 'Update scores database'
             git push origin main
           fi
-          echo '::set-output name=update-docs::$DATABASE_CHANGED'
+          # echo '::set-output name=update-docs::$DATABASE_CHANGED'
       - name: If database was updated, build Sphinx docs
         if: ${{ steps.commit-scores.update-docs == 1 }}
         uses: ./.github/workflows/build-sphinx-docs.yaml
