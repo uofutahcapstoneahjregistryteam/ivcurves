@@ -68,7 +68,7 @@ jobs:
         run: |
           git config user.name 'GitHub'
           git config user.email 'github@ivcurves'
-          git add scores_database.json
+          git add docs/sphinx/source/scores_database.json
           git commit -m 'Update scores database'
           git push origin main
 
