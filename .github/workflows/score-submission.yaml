@@ -17,7 +17,7 @@ jobs:
       run-scorer: ${{ steps.save-env.outputs.run-scorer }} # Boolean to run the run-scorer job
       requirements-filename: ${{ steps.save-env.outputs.requirements-filename }} # filename of the submission's Pip requirements file (usually requirements.txt)
       requirements-path: ${{ steps.save-env.outputs.requirements-path }} # path to the parent directory that contains requirements-filename
-      submission-main-filename: ${{ steps.save-env.outputs.submission-main }} # filename of the file that should be executed by run-scorer
+      submission-main-filename: ${{ steps.save-env.outputs.submission-main-filename }} # filename of the file that should be executed by run-scorer
       submission-main-path: ${{ steps.save-env.outputs.submission-main-path }} # path to the parent directory that contains submission-main-filename
     steps:
       - name: Checkout
@@ -50,7 +50,7 @@ jobs:
           echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
           echo '::set-output name=requirements-filename::${{ env.REQUIREMENTS_FILENAME }}'
           echo '::set-output name=requirements-path::${{ env.REQUIREMENTS_PATH }}'
-          echo '::set-output name=submission-main::${{ env.SUBMISSION_MAIN_FILENAME }}'
+          echo '::set-output name=submission-main-filename::${{ env.SUBMISSION_MAIN_FILENAME }}'
           echo '::set-output name=submission-main-path::${{ env.SUBMISSION_MAIN_PATH }}'
       - name: Upload pr_config.json to artifacts
         uses: actions/upload-artifact@v3
