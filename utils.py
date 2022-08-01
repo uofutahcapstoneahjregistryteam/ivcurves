@@ -145,7 +145,7 @@ def make_iv_curve_name(test_set_name, index):
 
 def get_filenames_in_directory(directory_path):
     """
-    Returns a set of filenames in the directory ``directory_path``.
+    Returns a set of entries in the directory ``directory_path``.
     The filenames do not have file extensions.
 
     Returns

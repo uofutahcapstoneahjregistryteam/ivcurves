@@ -15,8 +15,10 @@ jobs:
     outputs:
       contributor: ${{ steps.save-env.outputs.contributor }} # GitHub username of committer or pull request author
       run-scorer: ${{ steps.save-env.outputs.run-scorer }} # Boolean to run the run-scorer job
-      requirements: ${{ steps.save-env.outputs.requirements }} # path to the submission's requirements.txt
-      submission-main: ${{ steps.save-env.outputs.submission-main }} # path to the file that should be executed by run-scorer
+      requirements-filename: ${{ steps.save-env.outputs.requirements-filename }} # filename of the submission's Pip requirements file (usually requirements.txt)
+      requirements-path: ${{ steps.save-env.outputs.requirements-path }} # path to the parent directory that contains requirements-filename
+      submission-main-filename: ${{ steps.save-env.outputs.submission-main }} # filename of the file that should be executed by run-scorer
+      submission-main-path: ${{ steps.save-env.outputs.submission-main-path }} # path to the parent directory that contains submission-main-filename
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -38,14 +40,18 @@ jobs:
       - name: Set pr_config.json entries as environment variables
         run: python3 .github/workflows/utils/print_json_as_env.py
                submissions/${{ env.CONTRIBUTOR }}/pr_config.json
-               --validate-pr-config >> ${{ github.env }}
+               --validate-pr-config
+               --split-path-variables
+             >> ${{ github.env }}
       - name: Save scorer environment to job output
         id: save-env
         run: |
           echo '::set-output name=contributor::${{ env.CONTRIBUTOR }}'
           echo '::set-output name=run-scorer::${{ env.RUN_SCORER }}'
-          echo '::set-output name=requirements::${{ env.REQUIREMENTS }}'
-          echo '::set-output name=submission-main::${{ env.SUBMISSION_MAIN }}'
+          echo '::set-output name=requirements-filename::${{ env.REQUIREMENTS_FILENAME }}'
+          echo '::set-output name=requirements-path::${{ env.REQUIREMENTS_PATH }}'
+          echo '::set-output name=submission-main::${{ env.SUBMISSION_MAIN_FILENAME }}'
+          echo '::set-output name=submission-main-path::${{ env.SUBMISSION_MAIN_PATH }}'
       - name: Upload pr_config.json to artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -59,8 +65,10 @@ jobs:
     if: ${{ needs.read-pr-config.outputs.run-scorer == 'true' }}
     env:
       CONTRIBUTOR: ${{ needs.read-pr-config.outputs.contributor }}
-      REQUIREMENTS: ${{ needs.read-pr-config.outputs.requirements }}
-      SUBMISSION_MAIN: ${{ needs.read-pr-config.outputs.submission-main }}
+      REQUIREMENTS_FILENAME: ${{ needs.read-pr-config.outputs.requirements-filename }}
+      REQUIREMENTS_PATH: ${{ needs.read-pr-config.outputs.requirements-path }}
+      SUBMISSION_MAIN_FILENAME: ${{ needs.read-pr-config.outputs.submission-main-filename }}
+      SUBMISSION_MAIN_PATH: ${{ needs.read-pr-config.outputs.submission-main-path }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -71,11 +79,11 @@ jobs:
       - name: Install ivcurves requirements
         run: pip3 install -r requirements.txt
       - name: Install submission requirements
-        working-directory: submissions/${{ env.CONTRIBUTOR }}
-        run: pip3 install -r ${{ env.REQUIREMENTS }}
+        working-directory: submissions/${{ env.CONTRIBUTOR }}/${{ env.REQUIREMENTS_PATH }}
+        run: pip3 install -r ${{ env.REQUIREMENTS_FILENAME }}
       - name: Run submission
-        working-directory: submissions/${{ env.CONTRIBUTOR }}
-        run: python3 ${{ env.SUBMISSION_MAIN }}
+        working-directory: submissions/${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_MAIN_PATH }}
+        run: python3 ${{ env.SUBMISSION_MAIN_FILENAME }}
       - name: Run scorer
         working-directory: submissions/${{ env.CONTRIBUTOR }}
         run: python3 ../../compare_curves.py . --csv-output-path .
