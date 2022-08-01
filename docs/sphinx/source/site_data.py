@@ -5,7 +5,7 @@ from mpmath import mp
 
 
 def load_scores_database():
-    with open('../../../scores_database.json', 'r') as file:
+    with open('scores_database.json', 'r') as file:
         return json.load(file)
 
 

@@ -4,7 +4,7 @@ import pathlib
 from mpmath import mp
 
 
-TEST_SETS_DIR = f'{pathlib.Path(__file__).parent}/test_sets'
+TEST_SETS_DIR = f'{pathlib.Path(__file__).parent}/../test_sets'
 IV_PARAMETER_NAMES = ['photocurrent', 'saturation_current',
                       'resistance_series', 'resistance_shunt', 'n',
                       'cells_in_series']

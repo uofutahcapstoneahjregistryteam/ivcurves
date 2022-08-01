@@ -1,4 +1,4 @@
-.. currentmodule:: precise
+.. currentmodule:: ivcurves.precise
 
 Precise
 =======

@@ -1,4 +1,4 @@
-.. currentmodule:: utils
+.. currentmodule:: ivcurves.utils
 
 Utils
 =====

@@ -1,4 +1,4 @@
-.. currentmodule:: compare_curves
+.. currentmodule:: ivcurves.compare_curves
 
 Compare Curves
 ==============

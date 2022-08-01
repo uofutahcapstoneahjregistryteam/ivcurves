@@ -62,7 +62,7 @@ jobs:
                --pr-number ${{ env.PR_NUMBER }}
                --pr-closed-at ${{ github.event.pull_request.closed_at }}
                --overall-scores-path overall_scores.csv
-               --database-path scores_database.json
+               --database-path docs/sphinx/source/scores_database.json
       - name: Commit and push scores database
         id: commit-scores
         run: |

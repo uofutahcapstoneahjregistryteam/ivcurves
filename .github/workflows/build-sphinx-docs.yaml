@@ -28,7 +28,7 @@ jobs:
           pip3 install -r requirements.txt
       - name: Generate Sphinx docs test case images
         working-directory: main
-        run: python3 precise.py --save-images docs/sphinx/source/_images/test_cases
+        run: python3 ivcurves/precise.py --save-images docs/sphinx/source/_images/test_cases
       - name: Rebuild Sphinx docs html
         working-directory: main/docs/sphinx
         run: make html

@@ -5,9 +5,9 @@ Allows useful functions in utils.py to be used by the Sphinx docs scripts.
 import os
 import sys
 
-REPO_ROOT = '../../..'
+IVCURVES = '../../../ivcurves'
 
-sys.path.insert(0, os.path.abspath(REPO_ROOT))
+sys.path.insert(0, os.path.abspath(IVCURVES))
 
 import utils # utils.py used by ivcurves scripts
 
