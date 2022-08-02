@@ -1,4 +1,4 @@
-Name: Update scores
+name: Update scores
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        value: ${{fromJson(needs.setup.outputs.matrix)}}
+        value: ${{ fromJson(needs.setup.outputs.matrix) }}
     steps:
       - run: |
           echo "${{ matrix.value }}"
