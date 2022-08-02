@@ -20,7 +20,7 @@ jobs:
         env:
           DATABASE_PATH: docs/sphinx/source/scores_database.json
         run: |
-          export $PR_NUMBERS=''
+          export PR_NUMBERS=''
           python3 -c "
           import json
           with open('${{ env.DATABASE_PATH }}', 'r') as file:
