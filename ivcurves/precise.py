@@ -500,7 +500,7 @@ def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
     # allocate array for new, more precise i's
     precise_i = np.zeros(ii.shape[0], dtype=mp.mpf)
     i_precise_enough = lambda c: abs(diff_lhs_rhs(v, c, il, io, rs, rsh, n, vth, ns)) < atol
-    for idx, (v, i) in enumerate(zip(vv, ii, strict=True)):
+    for idx, (v, i) in enumerate(zip(vv, ii)):
         # check if i val already precise enough
         if i_precise_enough(i): 
             new_i = i

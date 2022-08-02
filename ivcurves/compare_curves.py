@@ -326,7 +326,7 @@ def total_score(known_curve_params, fitted_curve_params, vth, num_pts, atol):
 
     score = 0
 
-    for v, i in list(zip(fit_xs, fit_ys)):
+    for v, i in zip(fit_xs, fit_ys):
         # for each point (`v`, `i`) on the fitted curve, find the associated
         # point on known curve (`new_voltage`, `new_current`)
         new_voltage = find_x_intersection(single_diode, known_xs, known_ys, v, i, num_pts, atol)
