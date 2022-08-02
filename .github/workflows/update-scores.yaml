@@ -24,20 +24,29 @@ jobs:
           import json
           with open('${{ env.DATABASE_PATH }}', 'r') as file:
               database = json.load(file)
-              print(list(database.keys()))
+          pr_data = []
+          for pr_number, data in database.items():
+              pair = {'pr_number': pr_number, 'username': data['username']}
+              pr_data .append(pair)
+          print(pr_data)
           ")
           echo PR_DATA=$PR_DATA >> ${{ github.env }}
       - name: Set pull request data output
         id: matrix
         run: |
           echo '::set-output name=pr-data::${{ env.PR_DATA }}'
-  build:
+
+  upload-pr-submission-to-artifacts:
+    name: Upload pull request submission to artifacts
     needs: get-pr-data
     runs-on: ubuntu-latest
     strategy:
       matrix:
         pr-data: ${{ fromJson(needs.get-pr-data.outputs.pr-data) }}
     steps:
+      - name: Checkout pull request HEAD
       - run: |
-          echo "${{ matrix.pr-data }}"
+          echo "${{ matrix.pr-data.pr-number }}"
+          echo "${{ matrix.pr-data.username }}"
+          gh pr checkout ${{ matrix.pr-data.pr-number }}
 
