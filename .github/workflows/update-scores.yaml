@@ -4,22 +4,40 @@ on:
   workflow_dispatch:
 
 jobs:
-
-  setup:
+  get-pr-numbers:
+    name: Get pull request numbers from scores database
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.matrix.outputs.value }}
+      pr-numbers: ${{ steps.matrix.outputs.pr-numbers }}
     steps:
-      - id: matrix
+      - name: Checkout pull request target
+        uses: actions/checkout@v3
+      - name: Install Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Load scores database and get pull request numbers
+        env:
+          DATABASE_PATH: docs/sphinx/source/scores_database.json
         run: |
-          echo '::set-output name=value::["a", "b", "c"]'
+          python3 -c "
+          import json
+          with open('${{ env.DATABASE_PATH }}', 'r') as file:
+              database = json.load(file)
+              print(list(database.keys()))
+          " >> $PR_NUMBERS
+          echo 'PR_NUMBERS=$PR_NUMBERS' >> ${{ github.env }}
+      - name: Set pull request numbers output
+        id: matrix
+        run: |
+          echo '::set-output name=pr-numbers::${{ env.PR_NUMBERS }}'
   build:
     needs: [ setup ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        value: ${{ fromJson(needs.setup.outputs.matrix) }}
+        pr-number: ${{ fromJson(needs.get-pr-numbers.outputs.pr-numbers) }}
     steps:
       - run: |
-          echo "${{ matrix.value }}"
+          echo "${{ matrix.pr-number }}"
 
