@@ -35,7 +35,7 @@ jobs:
       - name: Set pull request data output
         id: matrix
         run: |
-          echo '::set-output name=pr-data::${{ env.PR_DATA }}'
+          echo "::set-output name=pr-data::${{ env.PR_DATA }}"
   build:
     needs: get-pr-data
     runs-on: ubuntu-latest
