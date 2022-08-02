@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  get-pr-numbers:
-    name: Get pull request numbers from scores database
+  get-pr-data:
+    name: Get pull request data from scores database
     runs-on: ubuntu-latest
     outputs:
-      pr-numbers: ${{ steps.matrix.outputs.pr-numbers }}
+      pr-data: ${{ steps.matrix.outputs.pr-data }}
     steps:
       - name: Checkout pull request target
         uses: actions/checkout@v3
@@ -16,28 +16,37 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: Load scores database and get pull request numbers
+      - name: Load scores database and get pull request data
         env:
           DATABASE_PATH: docs/sphinx/source/scores_database.json
         run: |
-          export PR_NUMBERS=$(python3 -c "
+          export PR_DATA=$(python3 -c "
           import json
           with open('${{ env.DATABASE_PATH }}', 'r') as file:
               database = json.load(file)
-              print(list(database.keys()))
+          pr_data = []
+          for pr_number, data in database.items():
+              pair = {'pr_number': pr_number, 'username': data['username']}
+              pr_data .append(pair)
+          print(pr_data)
           ")
-          echo PR_NUMBERS=$PR_NUMBERS >> ${{ github.env }}
-      - name: Set pull request numbers output
+          echo PR_DATA=$PR_DATA >> ${{ github.env }}
+      - name: Set pull request data output
         id: matrix
         run: |
-          echo '::set-output name=pr-numbers::${{ env.PR_NUMBERS }}'
-  build:
-    needs: [ get-pr-numbers ]
+          echo '::set-output name=pr-data::${{ env.PR_DATA }}'
+
+  upload-pr-submission-to-artifacts:
+    name: Upload pull request submission to artifacts
+    needs: get-pr-data
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        pr-number: ${{ fromJson(needs.get-pr-numbers.outputs.pr-numbers) }}
+        pr-data: ${{ fromJson(needs.get-pr-data.outputs.pr-data) }}
     steps:
+      - name: Checkout pull request HEAD
       - run: |
-          echo "${{ matrix.pr-number }}"
+          echo "${{ matrix.pr-data.pr-number }}"
+          echo "${{ matrix.pr-data.username }}"
+          gh pr checkout ${{ matrix.pr-data.pr-number }}
 
