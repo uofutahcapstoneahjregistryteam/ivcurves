@@ -116,10 +116,10 @@ jobs:
             source ${submissions_folder}/env/bin/activate
 
             # install submission requirements
-            pip3 install -r ${submissions_folder}/${REQUIREMENTS_PATH}/${REQUIREMENTS_FILENAME}
+            pip3 install -r "$submissions_folder"/"$REQUIREMENTS_PATH"/"$REQUIREMENTS_FILENAME"
 
             # run submission
-            python3 ${submissions_folder}/${SUBMISSION_MAIN_PATH}/${SUBMISSION_MAIN_FILENAME}
+            python3 "$submissions_folder"/"$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME"
 
             ls -R $submissions_folder
 
