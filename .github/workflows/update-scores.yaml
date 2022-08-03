@@ -36,17 +36,29 @@ jobs:
         id: matrix
         run: |
           echo "::set-output name=pr-data::${{ env.PR_DATA }}"
+
   build:
     needs: get-pr-data
     runs-on: ubuntu-latest
     strategy:
       matrix:
         pr-data: ${{ fromJson(needs.get-pr-data.outputs.pr-data) }}
+    env:
+      PR_NUMBER: ${{ matrix.pr-data[0] }}
+      PR_USERNAME: ${{ matrix.pr-data[1] }}
     steps:
       - name: Checkout pull request target
         uses: actions/checkout@v3
       - name: Checkout pull request HEAD
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr checkout ${{ matrix.pr-data[0] }}
+        run: gh pr checkout ${{ env.PR_NUMBER }}
+      - name: Rename submission folder
+        working-directory: submissions
+        run: cp -r ${{ env.PR_USERNAME }} ${{ env.PR_NUMBER}}_${{ env.PR_USERNAME }}
+      - name: Upload renamed submission folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.PR_NUMBER }}_${{ env.PR_USERNAME }}
+          path: submissions/${{ env.PR_NUMBER }}_${{ env.PR_USERNAME }}
+
