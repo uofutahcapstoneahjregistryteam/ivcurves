@@ -135,7 +135,7 @@ jobs:
             cd "$repo_base"
 
             # record updated entry in database
-            python3 .github/workflows/utils/record_scores.py --pr-author ${pr_usernames[i]} --pr-number \"${pr_numbers[i]}\" --pr-closed-at ${pr_datetimes[i]} --overall-scores-path "$submissions_folder"/overall_scores.csv --database-path docs/sphinx/source/scores_database.json
+            python3 .github/workflows/utils/record_scores.py --pr-author ${pr_usernames[i]} --pr-number ${pr_numbers[i]} --pr-closed-at ${pr_datetimes[i]} --overall-scores-path "$submissions_folder"/overall_scores.csv --database-path docs/sphinx/source/scores_database.json
 
             # deactivate and remove virtual environment
             deactivate

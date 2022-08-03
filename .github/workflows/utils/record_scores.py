@@ -125,7 +125,8 @@ def write_overall_scores_to_database(database, pr_number, pr_author, pr_closed_d
         A dictionary from test set filenames (excluding file extensions) to
         strings representing scores.
     """
-    database[pr_number] = {'username': pr_author,
+    # only want strings as dict keys
+    database[str(pr_number)] = {'username': pr_author,
                            'submission_datetime': pr_closed_datetime,
                            'debug':'debug',
                            'test_sets': overall_scores}
