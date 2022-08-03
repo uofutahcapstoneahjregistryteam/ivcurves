@@ -98,10 +98,35 @@ jobs:
           for ((i=0; i<$pr_data_length; i++)); do
             echo ${pr_numbers[i]} , ${pr_usernames[i]}
             submissions_folder=submissions/${pr_numbers[i]}--${pr_usernames[i]}
+
+            # read pr_config.json into environment variables
+            env_vars=($(python3 .github/workflows/utils/print_json_as_env.py
+                          ${submissions_folder}/pr_config.json
+                          --validate-pr-config
+                          --split-path-variables | tr '\\n' ' '))
+            for var in ${env_vars[@]}; do
+              echo $var
+              export $var
+            done
+
+            if ! $RUN_SCORER; then
+              continue
+            fi
+
+            # set up virtual environment
             python3 -m venv ${submissions_folder}/env
-            ls $submissions_folder
+              --system-site-packages # expose system packages (ivcurves requirements)
             source ${submissions_folder}/env/bin/activate
-            echo $(which python3)
+
+            # install submission requirements
+            pip3 install -r ${submissions_folder}/${REQUIREMENTS_PATH}/${REQUIREMENTS_FILENAME}
+
+            # run submission
+            python3 ${submissions_folder}/${SUBMISSION_MAIN_PATH}/${SUBMISSION_MAIN_FILENAME}
+
+            ls -R $submissions_folder
+
+            # deactivate and remove virtual environment
             deactivate
             rm -r ${submissions_folder}/env
           done
