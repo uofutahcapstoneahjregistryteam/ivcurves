@@ -27,7 +27,7 @@ jobs:
               database = json.load(file)
           pr_data = []
           for pr_number, data in database.items():
-              pair = [pr_number, data['username']]
+              pair = [pr_number, data['username'], data['submission_datetime']]
               pr_data .append(pair)
           print(pr_data)
           ")
@@ -94,11 +94,12 @@ jobs:
         run: |
           pr_numbers=($(echo '${{ toJson(fromJson(env.PR_DATA)[*][0]) }}' | tr -d '[",\n]'))
           pr_usernames=($(echo '${{ toJson(fromJson(env.PR_DATA)[*][1]) }}' | tr -d '[",\n]'))
+          pr_datetimes=($(echo '${{ toJson(fromJson(env.PR_DATA)[*][2]) }}' | tr -d '[",\n]'))
           pr_data_length=${#pr_numbers[@]}
           repo_base=$(pwd)
 
           for ((i=0; i<$pr_data_length; i++)); do
-            echo ${pr_numbers[i]} , ${pr_usernames[i]}
+            echo ${pr_numbers[i]} , ${pr_usernames[i]}, ${pr_datetimes[i]}
             submissions_folder=submissions/${pr_numbers[i]}--${pr_usernames[i]}
 
             # read pr_config.json into environment variables
@@ -117,18 +118,32 @@ jobs:
             python3 -m venv --system-site-packages "$submissions_folder"/env
             source "$submissions_folder"/env/bin/activate
 
+            # install submission requirements and run submission in its directory
+            cd "$submissions_folder"
+
             # install submission requirements
-            pip3 install -r "$submissions_folder"/"$REQUIREMENTS_PATH"/"$REQUIREMENTS_FILENAME"
+            pip3 install -r "$REQUIREMENTS_PATH"/"$REQUIREMENTS_FILENAME"
 
             # run submission
-            cd "$submissions_folder"
-            python3 "$submissions_folder"/"$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME"
-            ls
-            cd $repo_base
+            python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME"
 
+            # score submission
+            python3 ivcurves/compare_curves.py . --csv-output-path .
+            ls
+
+            cd "$repo_base"
+
+            # record updated entry in database
+            python3 .github/workflows/utils/record_scores.py --pr-author ${pr_usernames[i]} --pr-number ${pr_numbers[i]} --pr-closed-at ${pr_datetimes[i]} --overall-scores-path "$submissions_folder"/overall_scores.csv --database-path docs/sphinx/source/scores_database.json
 
             # deactivate and remove virtual environment
             deactivate
             rm -r "$submissions_folder"/env
           done
+
+          git config user.name 'GitHub'
+          git config user.email 'github@ivcurves'
+          git add docs/sphinx/source/scores_database.json
+          git commit -m 'Update all entries in scores database'
+          git push origin main
 
