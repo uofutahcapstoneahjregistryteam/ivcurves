@@ -38,8 +38,8 @@ jobs:
           echo "::set-output name=pr-data::${{ env.PR_DATA }}"
 
   build:
-    needs: get-pr-data
     runs-on: ubuntu-latest
+    needs: get-pr-data
     strategy:
       matrix:
         pr-data: ${{ fromJson(needs.get-pr-data.outputs.pr-data) }}
@@ -63,6 +63,7 @@ jobs:
           path: submissions/${{ env.PR_NUMBER }}_${{ env.PR_USERNAME }}
 
   score-all-submissions:
+    runs-on: ubuntu-latest
     needs:
       - get-pr-data
       - build
