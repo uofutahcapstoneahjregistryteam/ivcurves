@@ -134,8 +134,10 @@ jobs:
 
             cd "$repo_base"
 
+            exit_code=submission_exit_code || scorer_exit_code
+
             # record updated entry in database
-            python3 .github/workflows/utils/record_scores.py --submission-exit-code ($submission_exit_code || $scorer_exit_code) --pr-author ${pr_usernames[i]} --pr-number ${pr_numbers[i]} --pr-closed-at ${pr_datetimes[i]} --overall-scores-path "$submissions_folder"/overall_scores.csv --database-path docs/sphinx/source/scores_database.json
+            python3 .github/workflows/utils/record_scores.py --submission-exit-code $exit_code --pr-author ${pr_usernames[i]} --pr-number ${pr_numbers[i]} --pr-closed-at ${pr_datetimes[i]} --overall-scores-path "$submissions_folder"/overall_scores.csv --database-path docs/sphinx/source/scores_database.json
 
             # deactivate and remove virtual environment
             deactivate
