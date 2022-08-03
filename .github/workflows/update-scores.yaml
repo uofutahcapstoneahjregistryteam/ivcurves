@@ -95,7 +95,7 @@ jobs:
           pr_numbers=($(echo '${{ toJson(fromJson(env.PR_DATA)[*][0]) }}' | tr -d '[",\n]'))
           pr_usernames=($(echo '${{ toJson(fromJson(env.PR_DATA)[*][1]) }}' | tr -d '[",\n]'))
           pr_data_length=${#pr_numbers[@]}
-          REPO_BASE=$(pwd)
+          repo_base=$(pwd)
 
           for ((i=0; i<$pr_data_length; i++)); do
             echo ${pr_numbers[i]} , ${pr_usernames[i]}
@@ -121,9 +121,11 @@ jobs:
             pip3 install -r "$submissions_folder"/"$REQUIREMENTS_PATH"/"$REQUIREMENTS_FILENAME"
 
             # run submission
+            cd "$submissions_folder"
             python3 "$submissions_folder"/"$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME"
+            ls
+            cd $repo_base
 
-            ls $submissions_folder
 
             # deactivate and remove virtual environment
             deactivate
