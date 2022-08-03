@@ -5,7 +5,8 @@
     "test_sets": {
       "case1": "438.2491416282271253",
       "case2": "436.6555645081116309"
-    }
+    },
+    "broken": "Missing scores from these test sets: case3"
   },
   "80": {
     "username": "uofutahcapstoneahjregistryteam",
@@ -13,6 +14,7 @@
     "test_sets": {
       "case1": "438.2491416282271253",
       "case2": "436.6555645081116309"
-    }
+    },
+    "broken": "Missing scores from these test sets: case3"
   }
 }
