@@ -97,11 +97,11 @@ jobs:
           for ((i=0; i<$pr_data_length; i++)); do
             echo ${pr_numbers[i]} , ${pr_usernames[i]}
             submission_folder=submissions/${pr_numbers[i]}--${pr_usernames[i]}
-            python3 -m venv $submission_folder
-            ls submissions
-            source ${submissions_folder}/bin/activate
+            python3 -m venv $submission_folder/env
+            ls $submissions_folder
+            source ${submissions_folder}/env/bin/activate
             echo $(which python3)
             deactivate
-            rm -r $submissions_folder
+            rm -r ${submissions_folder}/env
           done
 
