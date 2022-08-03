@@ -69,7 +69,7 @@ jobs:
       - get-pr-data
       - build
     env:
-      PR_DATA: ${{ fromJson(needs.get-pr-data.outputs.pr-data) }}
+      PR_DATA: ${{ needs.get-pr-data.outputs.pr-data }}
     steps:
       - name: Checkout base main
         uses: actions/checkout@v3
@@ -87,4 +87,10 @@ jobs:
           path: submissions
       - name: debug
         run: ls -R submissions
+      - name: Run all submissions
+        run: |
+          for item in ${{ fromJson(env.PR_DATA) }}
+          do
+            echo $item
+          done
 
