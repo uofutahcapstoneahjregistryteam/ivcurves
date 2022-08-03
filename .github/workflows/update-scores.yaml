@@ -43,8 +43,10 @@ jobs:
       matrix:
         pr-data: ${{ fromJson(needs.get-pr-data.outputs.pr-data) }}
     steps:
+      - name: Checkout pull request target
+        uses: actions/checkout@v3
       - name: Checkout pull request HEAD
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr checkout ${{ matrix.pr-data[0] }} --repo reepoi/ivcurves
+          gh pr checkout ${{ matrix.pr-data[0] }}
