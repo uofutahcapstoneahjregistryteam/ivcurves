@@ -47,7 +47,7 @@ jobs:
       PR_NUMBER: ${{ matrix.pr-data[0] }}
       PR_USERNAME: ${{ matrix.pr-data[1] }}
     steps:
-      - name: Checkout pull request target
+      - name: Checkout base main
         uses: actions/checkout@v3
       - name: Checkout pull request HEAD
         env:
@@ -61,4 +61,28 @@ jobs:
         with:
           name: ${{ env.PR_NUMBER }}_${{ env.PR_USERNAME }}
           path: submissions/${{ env.PR_NUMBER }}_${{ env.PR_USERNAME }}
+
+  score-all-submissions:
+    needs:
+      - get-pr-data
+      - build
+    env:
+      PR_DATA: ${{ needs.get-pr-data.outputs.pr-data }}
+    steps:
+      - name: Checkout base main
+        uses: actions/checkout@v3
+      - name: Install Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Clear submissions folder
+        run: |
+          rm -r submissions
+          mkdir submissions
+      - name: Download all submissions from artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: submissions
+      - name: debug
+        run: ls -R submissions
 
