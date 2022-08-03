@@ -125,7 +125,7 @@ jobs:
             pip3 install -r "$REQUIREMENTS_PATH"/"$REQUIREMENTS_FILENAME"
 
             # run submission
-            submission_exit_code=$(python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME")
+            submission_exit_code=$(python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME"; echo $?)
 
             # score submission
             python3 "$repo_base"/ivcurves/compare_curves.py . --csv-output-path .
