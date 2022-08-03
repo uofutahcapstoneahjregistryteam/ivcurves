@@ -93,6 +93,6 @@ jobs:
           pr_usernames=($(echo ${{ toJson(fromJson(env.PR_DATA)[*][1]) }} | tr -d '[],\\n'))
           pr_data_length=${#pr_numbers[@]}
           for ((i=0; i<$pr_data_length; i++)); do
-            echo "${pr_numbers[i]} , ${pr_usernames[i]}"
+            echo '${pr_numbers[i]} , ${pr_usernames[i]}'
           done
 
