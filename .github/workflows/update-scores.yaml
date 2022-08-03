@@ -89,8 +89,10 @@ jobs:
         run: ls -R submissions
       - name: Run all submissions
         run: |
-          for item in ${{ fromJson(env.PR_DATA) }}
-          do
-            echo $item
+          pr_numbers=($(echo ${{ toJson(fromJson(env.PR_DATA)[1]) }} | tr -d '[],'))
+          pr_usernames=($(echo ${{ toJson(fromJson(env.PR_DATA)[1]) }} | tr -d '[],'))
+          pr_data_length=${#pr_numbers[@]}
+          for ((i=0; i<$pr_data_length; i++)); do
+            echo "${pr_numbers[i]} , ${pr_usernames[i]}"
           done
 
