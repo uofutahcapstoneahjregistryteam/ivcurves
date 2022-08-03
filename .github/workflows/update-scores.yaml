@@ -124,17 +124,11 @@ jobs:
             # install submission requirements
             pip3 install -r "$REQUIREMENTS_PATH"/"$REQUIREMENTS_FILENAME"
 
-            # run submission
-            submission_exit_code=0
-            if [[ $(python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME"; echo $?) != 0 ]]; then
-              submission_exit_code=1
-            fi
+            # run submission (may fail)
+            submission_exit_code=$(python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME"; echo $?)
 
             # score submission
-            scorer_exit_code=0
-            if [[ $(python3 "$repo_base"/ivcurves/compare_curves.py . --csv-output-path .; echo $?) != 0 ]]; then
-              scorer_exit_code=1
-            fi
+            python3 "$repo_base"/ivcurves/compare_curves.py . --csv-output-path .
 
             ls
 
@@ -143,7 +137,7 @@ jobs:
             exit_code=$submission_exit_code || $scorer_exit_code
 
             # record updated entry in database
-            python3 .github/workflows/utils/record_scores.py --submission-exit-code $exit_code --pr-author ${pr_usernames[i]} --pr-number ${pr_numbers[i]} --pr-closed-at ${pr_datetimes[i]} --overall-scores-path "$submissions_folder"/overall_scores.csv --database-path docs/sphinx/source/scores_database.json
+            python3 .github/workflows/utils/record_scores.py --broken-if-invalid --pr-author ${pr_usernames[i]} --pr-number ${pr_numbers[i]} --pr-closed-at ${pr_datetimes[i]} --overall-scores-path "$submissions_folder"/overall_scores.csv --database-path docs/sphinx/source/scores_database.json
 
             # deactivate and remove virtual environment
             deactivate

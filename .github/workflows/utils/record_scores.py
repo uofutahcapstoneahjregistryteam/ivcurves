@@ -70,6 +70,12 @@ def validate_overall_scores(overall_scores):
     overall_scores : dict
         A dictionary from test set filenames (excluding file extensions) to
         strings representing scores.
+
+    Returns
+    -------
+    bool, str
+        Boolean for whether ``overall_scores`` is valid or not, and a string
+        for an error message.
     """
     overall_scores_keys = set(overall_scores.keys())
 
@@ -78,13 +84,15 @@ def validate_overall_scores(overall_scores):
     missing_test_set_filenames = valid_test_set_filenames - overall_scores_keys
 
     if missing_test_set_filenames:
-        raise ValueError(f'Missing scores from these test sets: {", ".join(missing_test_set_filenames)}')
+        return False, f'Missing scores from these test sets: {", ".join(missing_test_set_filenames)}'
 
     for name, score_str in overall_scores.items():
         try:
             float(score_str) # validate is a number
         except ValueError:
-            raise ValueError("The score of test set '{name}' must parse to a float: {score_str}")
+            return False, "The score of test set '{name}' must parse to a float: {score_str}"
+
+    return True, ''
 
 
 def write_overall_scores_to_database(database, pr_number, pr_author, pr_closed_datetime, overall_scores):
@@ -131,7 +139,7 @@ def write_overall_scores_to_database(database, pr_number, pr_author, pr_closed_d
                            'test_sets': overall_scores}
 
 
-def make_submission_broken(database, pr_number):
+def mark_submission_broken(database, pr_number, validation_msg):
     """
     Adds the entry ``"broken": true`` to indicate that the submission does
     not run will all the test sets.
@@ -146,13 +154,13 @@ def make_submission_broken(database, pr_number):
     pr_number : int
         The pull request number.
     """
-    database[str(pr_number)]['broken'] = True
+    database[str(pr_number)]['broken'] = validation_msg
 
 
 def get_argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--submission-exit-code', type=int,
-                        help='Exit code of the submission')
+    parser.add_argument('--broken-if-invalid', action=argparse.BooleanOptionalAction,
+                        help='Mark submission broken instead of raising an exception')
     parser.add_argument('--pr-author', dest='pr_author', type=str,
                         help='GitHub username of the pull request author')
     parser.add_argument('--pr-number', dest='pr_number', type=int,
@@ -170,13 +178,15 @@ if __name__ == '__main__':
     args = get_argparser().parse_args()
 
     overall_scores = load_overall_scores(args.overall_scores_path)
-    scorer_code = validate_overall_scores(overall_scores)
+    has_valid_scores, validation_msg = validate_overall_scores(overall_scores)
     database = load_json(args.database_path)
 
-    if args.submission_exit_code == 0:
+    if has_valid_scores:
         write_overall_scores_to_database(database, args.pr_number, args.pr_author, args.pr_closed_datetime, overall_scores)
+    else if args.broken_if_invalid:
+        mark_submission_broken(database, args.pr_number, validation_msg)
     else:
-        mark_submission_broken(database, args.pr_number)
+        raise ValueError(validation_msg)
 
     save_json(database, f'{ROOT_DIR}/{args.database_path}')
 
