@@ -128,7 +128,6 @@ def write_overall_scores_to_database(database, pr_number, pr_author, pr_closed_d
     # only want strings as dict keys
     database[str(pr_number)] = {'username': pr_author,
                            'submission_datetime': pr_closed_datetime,
-                           'debug':'debug',
                            'test_sets': overall_scores}
 
 
@@ -154,6 +153,5 @@ if __name__ == '__main__':
     scorer_code = validate_overall_scores(overall_scores)
     database = load_json(args.database_path)
     write_overall_scores_to_database(database, args.pr_number, args.pr_author, args.pr_closed_datetime, overall_scores)
-    print(database)
     save_json(database, f'{ROOT_DIR}/{args.database_path}')
 
