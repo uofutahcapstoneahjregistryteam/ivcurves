@@ -128,7 +128,8 @@ jobs:
             python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME"
 
             # score submission
-            python3 ivcurves/compare_curves.py . --csv-output-path .
+            python3 "$repo_base"/ivcurves/compare_curves.py . --csv-output-path .
+
             ls
 
             cd "$repo_base"
