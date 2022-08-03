@@ -60,8 +60,8 @@ jobs:
       - name: Upload renamed submission folder
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PR_NUMBER }}_${{ env.PR_USERNAME }}
-          path: submissions/${{ env.PR_NUMBER }}_${{ env.PR_USERNAME }}
+          name: ${{ env.PR_NUMBER }}--${{ env.PR_USERNAME }}
+          path: submissions/${{ env.PR_NUMBER }}--${{ env.PR_USERNAME }}
 
   score-all-submissions:
     runs-on: ubuntu-latest
