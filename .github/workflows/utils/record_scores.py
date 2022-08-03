@@ -183,7 +183,7 @@ if __name__ == '__main__':
 
     if has_valid_scores:
         write_overall_scores_to_database(database, args.pr_number, args.pr_author, args.pr_closed_datetime, overall_scores)
-    else if args.broken_if_invalid:
+    elif args.broken_if_invalid:
         mark_submission_broken(database, args.pr_number, validation_msg)
     else:
         raise ValueError(validation_msg)
