@@ -47,4 +47,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr checkout ${{ matrix.pr-data[0] }}
+          gh pr checkout ${{ matrix.pr-data[0] }} --repo reepoi/ivcurves
