@@ -131,8 +131,28 @@ def write_overall_scores_to_database(database, pr_number, pr_author, pr_closed_d
                            'test_sets': overall_scores}
 
 
+def make_submission_broken(database, pr_number):
+    """
+    Adds the entry ``"broken": true`` to indicate that the submission does
+    not run will all the test sets.
+
+    See :func:`write_overall_scores_to_database` for more info on ``database``.
+
+    Parameters
+    ----------
+    database : dict
+        The scores database.
+
+    pr_number : int
+        The pull request number.
+    """
+    database[str(pr_number)]['broken'] = True
+
+
 def get_argparser():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--submission-exit-code', type=int,
+                        help='Exit code of the submission')
     parser.add_argument('--pr-author', dest='pr_author', type=str,
                         help='GitHub username of the pull request author')
     parser.add_argument('--pr-number', dest='pr_number', type=int,
@@ -152,6 +172,11 @@ if __name__ == '__main__':
     overall_scores = load_overall_scores(args.overall_scores_path)
     scorer_code = validate_overall_scores(overall_scores)
     database = load_json(args.database_path)
-    write_overall_scores_to_database(database, args.pr_number, args.pr_author, args.pr_closed_datetime, overall_scores)
+
+    if args.submission_exit_code == 0:
+        write_overall_scores_to_database(database, args.pr_number, args.pr_author, args.pr_closed_datetime, overall_scores)
+    else:
+        mark_submission_broken(database, args.pr_number)
+
     save_json(database, f'{ROOT_DIR}/{args.database_path}')
 
