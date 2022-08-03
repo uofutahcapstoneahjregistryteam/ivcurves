@@ -112,7 +112,8 @@ jobs:
 
             # set up virtual environment
             # --system-site-packages exposes system packages (ivcurves requirements)
-            python3 -m venv ${submissions_folder}/env --system-site-packages # expose system packages (ivcurves requirements)
+            python3 -m venv --system-site-packages ${submissions_folder}/env
+            pip3 list -v
             source ${submissions_folder}/env/bin/activate
 
             # install submission requirements
