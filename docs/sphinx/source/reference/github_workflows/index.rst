@@ -7,5 +7,5 @@ GitHub Workflows
    score_submission
    record_scores
    build_sphinx_docs
-   utilities/index
+   utils/index
 

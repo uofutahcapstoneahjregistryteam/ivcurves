@@ -1,9 +1,9 @@
-.. currentmodule:: \.github.workflows.utils.print_json_as_env
+.. currentmodule:: workflows.utils.print_json_as_env
 
 Print JSON as ENV
 =================
 
-.. autoprogram:: print_json_as_env:get_argparser()
+.. autoprogram:: workflows.utils.print_json_as_env:get_argparser()
    :prog: print_json_as_env.py
 
 .. autosummary::

@@ -1,16 +1,12 @@
-.. currentmodule:: \.github.workflows.utils.record_scores
-
 Record Scores
 =============
 
-.. autoprogram:: record_scores::get_argparser()
-   :prog: record_scores.py
+.. mermaid::
 
-.. autosummary::
-   :toctree: generated/
+   flowchart
+   PullRequestMerged(The Competitor's pull request is merged into ivcurves' main branch) --> StartWorkflow(GitHub begins running this workflow)
 
-   load_overall_scores
-   test_set_filenames
-   validate_overall_scores
-   write_overall_scores_to_database
+   StartWorkflow --> CheckoutIVCurvesBase(Checkout ivcurves' main branch)
+   CheckoutIVCurvesBase --> InstallPython310(Install Python 3.10)
+   InstallPython310 --> DownloadPRConfigFromPR(Download pr_config.json from the artifacts of the latest score-submission workflow that ran on the merged pull request)
 
