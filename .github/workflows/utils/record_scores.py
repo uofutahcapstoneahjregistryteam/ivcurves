@@ -90,17 +90,19 @@ def validate_overall_scores(overall_scores):
 def write_overall_scores_to_database(database, pr_number, pr_author, pr_closed_datetime, overall_scores):
     """
     Writes an entry in the JSON scores database.
-    Entries are of this form:
+    The scores database has this structure:
 
-    .. code-block:: json
+    .. code-block::
 
-       "<pr_number>": {
-           "username": "<pr_author>",
-           "submission_datetime": "<pr_closed_datetime>",
-           "test_sets": {
-               "<test_set_filename>": "<score>"
-               ...
-           }
+       {
+          "<pr_number>": {
+              "username": "<pr_author>",
+              "submission_datetime": "<pr_closed_datetime>",
+              "test_sets": {
+                  "<test_set_filename>": "<score>",
+                  ...
+              }
+          }
        }
 
     As tables, the database has two tables: submissions, and test_set_scores.
@@ -133,15 +135,15 @@ def write_overall_scores_to_database(database, pr_number, pr_author, pr_closed_d
 def get_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--pr-author', dest='pr_author', type=str,
-                        help='GitHub username of the pull request author')
+                        help='GitHub username of the pull request author.')
     parser.add_argument('--pr-number', dest='pr_number', type=int,
-                        help='GitHub pull request number')
+                        help='GitHub pull request number.')
     parser.add_argument('--pr-closed-at', dest='pr_closed_datetime', type=str,
-                        help='Datetime when the GitHub pull request closed')
+                        help='Datetime when the GitHub pull request closed.')
     parser.add_argument('--overall-scores-path', dest='overall_scores_path',
-                        type=str, help='Path to the CSV of overall scores')
+                        type=str, help='Path to the CSV of overall scores.')
     parser.add_argument('--database-path', dest='database_path', type=str,
-                        help='Path to the JSON scores database')
+                        help='Path to the JSON scores database.')
     return parser
 
 

@@ -5,7 +5,7 @@ Score Submission Workflow
 
    flowchart
    Push(A commit is pushed)
-   PullRequest(Pull Request is opened, synchronized, or closed)
+   PullRequest(A pull Request is opened, synchronized, or closed)
 
    Push --> StartWorkflow(GitHub begins running this workflow)
    PullRequest --> StartWorkflow
@@ -13,8 +13,9 @@ Score Submission Workflow
    StartWorkflow --> StartReadPRConfigJob(GitHub begins the read-pr-config job)
 
    StartReadPRConfigJob --> CheckoutReadPRConfig(Checkout Competitor's pull request branch)
+   CheckoutReadPRConfig --> InstallPython310ReadPRConfig(Install Python 3.10)
 
-   CheckoutReadPRConfig --> ReadPRConfig(Read the Competitor's pr_config.json)
+   InstallPython310ReadPRConfig --> ReadPRConfig(Read and validate the Competitor's pr_config.json)
 
    ReadPRConfig --> UploadPRConfig(Upload pr_config.json to the workflow's artifacts)
    
@@ -22,8 +23,8 @@ Score Submission Workflow
    UploadPRConfig -->|RUN_SCORER is false| TerminateWorkflow(End the workflow)
 
    StartScoreSubmissionJob --> CheckoutScoreSubmission(Checkout Competitor's pull request branch)
-   CheckoutScoreSubmission --> InstallPython310(Install Python 3.10)
-   InstallPython310 --> InstallIVCurvesDependencies(Install ivcurves Python dependencies)
+   CheckoutScoreSubmission --> InstallPython310ScoreSubmission(Install Python 3.10)
+   InstallPython310ScoreSubmission --> InstallIVCurvesDependencies(Install ivcurves Python dependencies)
    InstallIVCurvesDependencies --> InstallCompetitorDependencies(Install Competitor's Python dependencies)
 
    InstallCompetitorDependencies --> RunCompetitorSubmission(Run the Competitor's submission)
