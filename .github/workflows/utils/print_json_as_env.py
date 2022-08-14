@@ -49,7 +49,7 @@ def format_bool_variables(key, validated_dict):
 
 
 def format_path_variables(key, validated_dict, split_path_variables):
-    quote_path = lambda path: f"'{path}'"
+    quote_path = lambda path: f'"{path}"'
     value = validated_dict[key]
     if isinstance(value, pathlib.Path):
         validated_dict[key] = quote_path(value)
