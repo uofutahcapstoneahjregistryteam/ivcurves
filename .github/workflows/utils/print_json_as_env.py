@@ -99,13 +99,19 @@ def format_path_variables(key, validated_dict, options):
         A dict containing options that affect the behavior of the functions
         called during the iteration.
     """
+    str_path = lambda path: str(path)
     quote_path = lambda path: f'"{path}"'
+    if options.get('quote_path_variables', False):
+        format_path = quote_path
+    else:
+        format_path = str_path
+
     value = validated_dict[key]
     if isinstance(value, pathlib.Path):
-        validated_dict[key] = quote_path(value)
+        validated_dict[key] = format_path(value)
         if options.get('split_path_variables', False):
-            validated_dict[f'{key}_FILENAME'] = quote_path(value.name)
-            validated_dict[f'{key}_PATH'] = quote_path(value.parent)
+            validated_dict[f'{key}_FILENAME'] = format_path(value.name)
+            validated_dict[f'{key}_PATH'] = format_path(value.parent)
 
 
 def format_variable_values(validated_dict, options):
@@ -157,6 +163,8 @@ def get_argparser():
                         help='Runs the pr_config.json validator.')
     parser.add_argument('--split-path-variables', action=argparse.BooleanOptionalAction,
                         help='Adds two additional variables when a path variable P is encountered: a parent directory variable (P_PATH), and a filename variable (P_FILENAME).')
+    parser.add_argument('--quote-path-variables', action=argparse.BooleanOptionalAction,
+                        help='Wrap path variables in double quotes (")')
     return parser
 
 
