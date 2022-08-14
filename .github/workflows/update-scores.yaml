@@ -28,7 +28,7 @@ jobs:
           pr_data = []
           for pr_number, data in database.items():
               pair = [pr_number, data['username'], data['submission_datetime']]
-              pr_data .append(pair)
+              pr_data.append(pair)
           print(pr_data)
           ")
           echo PR_DATA=$PR_DATA >> ${{ github.env }}
@@ -37,7 +37,7 @@ jobs:
         run: |
           echo "::set-output name=pr-data::${{ env.PR_DATA }}"
 
-  build:
+  collect-pr-submissions:
     runs-on: ubuntu-latest
     needs: get-pr-data
     strategy:
@@ -68,7 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - get-pr-data
-      - build
+      - collect-pr-submissions
     env:
       PR_DATA: ${{ needs.get-pr-data.outputs.pr-data }}
     steps:
@@ -92,12 +92,36 @@ jobs:
         run: ls -R submissions
       - name: Run all submissions
         run: |
+          #               PR_DATA
+          # pr_number | pr_username | pr_datetime
+          # ----------|-------------|------------
+          #     #     |     str     |   <date>
+          #
+          # fromJson turns env.PR_DATA into a 2-d array like above.
+          # Next, the index [*][0] selects the first column.
+          # toJson pretty-prints the first column into this string:
+          # [
+          #   "#1",
+          #   "#2",
+          #   ...
+          # ]
+          # This string is piped into tr -d '[",\n]' which deletes all square
+          # brackets, double quotes, commans, and newline characters from the
+          # pretty-printed string above. This results in the following string:
+          # '#1 #2 ...'
+          # Wrapping this string (of space-seperated values) in parentheses
+          # gives a bash array of pull request numbers.
+          # Note: GitHub usernames and datetimes cannot contain brackets,
+          # spaces, double quotes, or newline characters. Therefore, the tr
+          # transformation won't unexpectedly delete characters from usernames
+          # or datetimes.
           pr_numbers=($(echo '${{ toJson(fromJson(env.PR_DATA)[*][0]) }}' | tr -d '[",\n]'))
           pr_usernames=($(echo '${{ toJson(fromJson(env.PR_DATA)[*][1]) }}' | tr -d '[",\n]'))
           pr_datetimes=($(echo '${{ toJson(fromJson(env.PR_DATA)[*][2]) }}' | tr -d '[",\n]'))
           pr_data_length=${#pr_numbers[@]}
           repo_base=$(pwd)
 
+          # run every pull request submission and record its score
           for ((i=0; i<$pr_data_length; i++)); do
             echo ${pr_numbers[i]} , ${pr_usernames[i]}, ${pr_datetimes[i]}
             submissions_folder=submissions/${pr_numbers[i]}--${pr_usernames[i]}
