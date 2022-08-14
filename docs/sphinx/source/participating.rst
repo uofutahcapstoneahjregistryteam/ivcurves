@@ -121,7 +121,7 @@ In the ``test_sets`` folder, there are multiple JSON files whose contents has th
 Under the ``"IV Curves"`` key is a list of IV curve data sets each with an ``"Index"`` value.
 The ``"Index"`` value is the test case number of the test set.
 
-For each JSON file ``<test_set_name>.json`` in ``test_sets``, your code must write a CSV file ``<test_set_name>.csv`` in ``submissions/<your_GitHub_username>``.
+For each JSON file ``<test_set_name>.json`` in ``test_sets``, your code must write a CSV file ``<test_set_name>.csv`` in the folder containing your submission main.
 Each CSV file must have these columns:
 
 .. datatemplate:nodata::
