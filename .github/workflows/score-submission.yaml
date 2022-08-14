@@ -86,7 +86,7 @@ jobs:
         run: python3 "${{ env.SUBMISSION_MAIN_FILENAME }}"
       - name: Run scorer
         # working-directory: submissions/${{ env.CONTRIBUTOR }}
-        run: python3 ../../ivcurves/compare_curves.py submissions/${{ env.CONTRIBUTOR }}/"${{ env.SUBMISSION_MAIN_PATH}}" --csv-output-path submissions/${{ env.CONTRIBUTOR }}
+        run: python3 ivcurves/compare_curves.py submissions/${{ env.CONTRIBUTOR }}/"${{ env.SUBMISSION_MAIN_PATH}}" --csv-output-path submissions/${{ env.CONTRIBUTOR }}
       - name: Save scores to artifacts
         uses: actions/upload-artifact@v3
         with:
