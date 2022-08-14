@@ -49,10 +49,14 @@ jobs:
     steps:
       - name: Checkout base main
         uses: actions/checkout@v3
-      - name: Checkout pull request HEAD
+      - name: Get pull request merge commit
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh pr checkout ${{ env.PR_NUMBER }}
+        run: |
+          MERGE_SHA=$(gh pr view ${{ env.PR_NUMBER }} -q .mergeCommit.oid --json mergeCommit)
+          echo MERGE_SHA=$MERGE_SHA >> ${{ github.env }}
+      - name: Checkout merge commit
+        run: git checkout ${{ env.MERGE_SHA }}
       - name: Rename submission folder
         working-directory: submissions
         # '--' is not allowed in GitHub usernames
