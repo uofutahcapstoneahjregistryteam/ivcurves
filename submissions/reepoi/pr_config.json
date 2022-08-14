@@ -1,5 +1,5 @@
 {
     "RUN_SCORER": true,
-    "REQUIREMENTS": "my sol/req uirements.txt",
-    "SUBMISSION_MAIN": "my sol/so lution.py"
+    "REQUIREMENTS": "my sol/test/req uirements.txt",
+    "SUBMISSION_MAIN": "my sol/test/so lution.py"
 }
