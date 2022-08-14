@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% set title = _('Leaderboard') %}
+{% block body %}
+{% for entry in leaderboard.leaderboard_entries %}
+- {{ entry.Index }}
+{% endfor %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Pull Request</th>
+            <th>Username</th>
+            <th>Overall Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in leaderboard.leaderboard_entries %}
+            <tr>
+                <th>#{{ entry.Index }}</th>
+                <th><a target="_blank" href="https://github.com/cwhanse/ivcurves/pull/{{ entry.pr_number }}">#{{ entry.pr_number }}</a></th>
+                <th><a target="_blank" href="https://github.com/{{ entry.username }}">{{ entry.username }}</a></th>
+                <th>{{ entry.overall_score }}</th>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+

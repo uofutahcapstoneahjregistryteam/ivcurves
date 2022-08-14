@@ -619,7 +619,6 @@ def write_test_set_json(test_set_filename, case_parameter_sets, vth, temp_cell,
                                                vth, ns, atol)
 
         nstr = utils.mp_nstr_precision_func
-
         vv_str_list = [nstr(x) for x in vv]
         ii_str_list = [nstr(x) for x in ii]
         case_test_suite['IV Curves'].append({

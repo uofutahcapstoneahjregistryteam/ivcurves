@@ -1,1 +1,20 @@
-{}
+{
+  "75": {
+    "username": "reepoi",
+    "submission_datetime": "2022-07-31T05:52:58Z",
+    "test_sets": {
+      "case1": "438.2491416282271253",
+      "case2": "436.6555645081116309"
+    },
+    "broken": "Missing scores from these test sets: case3"
+  },
+  "80": {
+    "username": "uofutahcapstoneahjregistryteam",
+    "submission_datetime": "2022-08-02T00:07:28Z",
+    "test_sets": {
+      "case1": "438.2491416282271253",
+      "case2": "436.6555645081116309"
+    },
+    "broken": "Missing scores from these test sets: case3"
+  }
+}

@@ -99,7 +99,7 @@ def format_path_variables(key, validated_dict, options):
         A dict containing options that affect the behavior of the functions
         called during the iteration.
     """
-    quote_path = lambda path: f"'{path}'"
+    quote_path = lambda path: f'"{path}"'
     value = validated_dict[key]
     if isinstance(value, pathlib.Path):
         validated_dict[key] = quote_path(value)
