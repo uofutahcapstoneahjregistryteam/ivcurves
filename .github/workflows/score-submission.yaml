@@ -80,10 +80,10 @@ jobs:
         run: pip3 install -r ivcurves/requirements.txt
       - name: Install submission requirements
         working-directory: submissions/${{ env.CONTRIBUTOR }}/${{ env.REQUIREMENTS_PATH }}
-        run: pip3 install -r ${{ env.REQUIREMENTS_FILENAME }}
+        run: pip3 install -r "${{ env.REQUIREMENTS_FILENAME }}"
       - name: Run submission
         working-directory: submissions/${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_MAIN_PATH }}
-        run: python3 ${{ env.SUBMISSION_MAIN_FILENAME }}
+        run: python3 "${{ env.SUBMISSION_MAIN_FILENAME }}"
       - name: Run scorer
         working-directory: submissions/${{ env.CONTRIBUTOR }}
         run: python3 ../../ivcurves/compare_curves.py . --csv-output-path .
