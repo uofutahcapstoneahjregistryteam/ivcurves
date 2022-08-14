@@ -12,7 +12,7 @@ Test Cases
 
    {{ data.title }}
    ----------------
-   
+
    {{ make_list_table([
          'Photocurrent (A)',
          'Saturation Current (A)',

@@ -43,14 +43,14 @@ def load_overall_scores(filename):
 
 
 def test_set_filenames():
-    """                                                                                                                                                                                                      
-    Returns a set of filenames in the directory ``directory_path``.                                                                                                                                          
-    The filenames do not have file extensions.                                                                                                                                                               
-                                                                                                                                                                                                             
-    Returns                                                                                                                                                                                                  
-    -------                                                                                                                                                                                                  
-    set                                                                                                                                                                                                      
-        A set of filenames without file extensions.                                                                                                                                                          
+    """
+    Returns a set of filenames in the directory ``directory_path``.
+    The filenames do not have file extensions.
+
+    Returns
+    -------
+    set
+        A set of filenames without file extensions.
     """
     return {entry.stem for entry in TEST_SETS_DIR.iterdir() if entry.is_file()}
 

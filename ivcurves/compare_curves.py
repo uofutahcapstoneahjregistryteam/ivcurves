@@ -58,7 +58,7 @@ def find_x_intersection(single_diode, known_xs, known_ys, xp, yp, num_segments, 
         x-coordinate of the intersection of known IV curve and line through the
         origin and the given point.
     """
-    if xp == 0: 
+    if xp == 0:
         # then line through origin and (`xp`, `yp`) sits on y-axis
         # so x coordinate at intersection must be zero
         return 0
@@ -123,11 +123,11 @@ def get_guess_interval(known_xs, known_ys, pt_on_line, num_segments):
 
     pts = list(zip(known_xs, known_ys))
     # go through line segments
-    for idx in range(len(pts)-1): 
-        if (pts[idx+1][0] == pts[idx][0]): 
-            # line segment is vertical, so x at intersection (`int_x`) 
+    for idx in range(len(pts)-1):
+        if (pts[idx+1][0] == pts[idx][0]):
+            # line segment is vertical, so x at intersection (`int_x`)
             # must be pts[idx][0] (==pts[idx+1][0])
-            int_x = pts[idx][0] 
+            int_x = pts[idx][0]
 
             if pt_on_line[0] == 0: # line is on y-axis
                 if int_x == 0: # segment is on y-axis
@@ -213,11 +213,11 @@ def find_distance(x, y, xp, yp):
     assert not (x == 0 and y == 0) # this should never happen for these curves
 
     if x == 0: # then xp == 0 too
-        diff_x, diff_y = 0, (yp - y) / y 
+        diff_x, diff_y = 0, (yp - y) / y
     elif y == 0: # then yp == 0 too
         diff_x, diff_y = (xp - x) / x, 0
     else: # x != 0 and y != 0
-        diff_x, diff_y = (xp - x) / x, (yp - y) / y 
+        diff_x, diff_y = (xp - x) / x, (yp - y) / y
 
     return mp.sqrt(diff_x**2 + diff_y**2)
 
@@ -229,7 +229,7 @@ def find_distance(x, y, xp, yp):
 
 def total_score(known_curve_params, fitted_curve_params, vth, num_pts, atol):
     r"""
-    Calculates the total score for a given fitted curve. 
+    Calculates the total score for a given fitted curve.
 
     This score encodes how good an approximation the fitted curve is for the
     curve with the known parameters. If the score is small, then the fitted
@@ -238,8 +238,8 @@ def total_score(known_curve_params, fitted_curve_params, vth, num_pts, atol):
     Parameters
     ----------
     known_curve_params : list
-        A list of parameters representing a given IV curve. They should be
-        passed in the order [il, io, rs, rsh, n, ns].
+        A list of parameters representing a given IV curve. The list items
+        should be in the order [il, io, rs, rsh, n, ns].
 
         il : numeric
             Light-generated current :math:`I_L` (photocurrent) [A]
@@ -290,7 +290,7 @@ def total_score(known_curve_params, fitted_curve_params, vth, num_pts, atol):
         The thermal voltage of the cell (in volts) may be calculated as
         :math:`k_B T_c / q`, where :math:`k_B` is Boltzmann's constant (J/K),
         :math:`T_c` is the temperature of the p-n junction in Kelvin, and
-        :math:`q` is the charge of an electron (coulombs). 
+        :math:`q` is the charge of an electron (coulombs).
 
     num_pts : int
         Number of points we want to compare between the two curves.
@@ -315,14 +315,14 @@ def total_score(known_curve_params, fitted_curve_params, vth, num_pts, atol):
     known curve; this point of intersection is what we compare the fitted point
     to. We then find the distance between these two points, using the
     definition of distance given in find_distance. The sum of the distances for
-    each pair of associated points is the score. 
+    each pair of associated points is the score.
     """
     # get xs and ys for known and fitted curves
     known_xs, known_ys = get_curve(known_curve_params, vth, num_pts, atol)
     fit_xs, fit_ys = get_curve(fitted_curve_params, vth, num_pts, atol)
 
     il, io, rs, rsh, n, ns = known_curve_params
-    single_diode = lambda v, i : il - io * mp.expm1((v + i*rs) / (n * ns * vth)) - ((v + i*rs) / rsh)  
+    single_diode = lambda v, i : il - io * mp.expm1((v + i*rs) / (n * ns * vth)) - ((v + i*rs) / rsh)
 
     score = 0
 
@@ -340,8 +340,7 @@ def total_score(known_curve_params, fitted_curve_params, vth, num_pts, atol):
         # calculate distance between these points, and add to score
         score += find_distance(new_voltage, new_current, v, i)
 
-    return score 
-
+    return score
 
 
 ########
@@ -383,7 +382,7 @@ def get_curve(curve_parameters, vth, num_pts, atol):
         The thermal voltage of the cell (in volts) may be calculated as
         :math:`k_B T_c / q`, where :math:`k_B` is Boltzmann's constant (J/K),
         :math:`T_c` is the temperature of the p-n junction in Kelvin, and
-        :math:`q` is the charge of an electron (coulombs). 
+        :math:`q` is the charge of an electron (coulombs).
 
     num_pts : int
         Number of points to calculate on the given curve.
@@ -463,12 +462,12 @@ def iv_plotter(iv_known, iv_fitted, vth, num_pts, atol, pts=None, plot_lines=Tru
         The thermal voltage of the cell (in volts) may be calculated as
         :math:`k_B T_c / q`, where :math:`k_B` is Boltzmann's constant (J/K),
         :math:`T_c` is the temperature of the p-n junction in Kelvin, and
-        :math:`q` is the charge of an electron (coulombs). 
+        :math:`q` is the charge of an electron (coulombs).
 
 
     num_pts : int
-        Number of points to use when plotting curves. 
-        
+        Number of points to use when plotting curves.
+
     atol : float
         The error of each of the solution pairs found is at most ``atol``. (See
         :func:`precise.get_precise_i`.)
@@ -505,7 +504,7 @@ def iv_plotter(iv_known, iv_fitted, vth, num_pts, atol, pts=None, plot_lines=Tru
     plt.plot(fit_xs, fit_ys, color='green')
 
     il, io, rs, rsh, n, ns = iv_known
-    single_diode = lambda v, i : il - io * mp.expm1((v + i*rs) / (n * ns * vth)) - ((v + i*rs) / rsh)  
+    single_diode = lambda v, i : il - io * mp.expm1((v + i*rs) / (n * ns * vth)) - ((v + i*rs) / rsh)
 
     num_segments = len(pts)
     count = 0
@@ -514,7 +513,7 @@ def iv_plotter(iv_known, iv_fitted, vth, num_pts, atol, pts=None, plot_lines=Tru
         plt.plot(vp, ip, marker='o', color='lightgreen', markersize=3)
 
         # get intersection point on known curve
-        try: 
+        try:
             new_voltage = find_x_intersection(single_diode, known_xs, known_ys, vp, ip, num_pts, atol)
             new_current = precise.lambert_i_from_v(new_voltage, il, io, rs, rsh, n, vth, ns)
         except:
@@ -526,7 +525,7 @@ def iv_plotter(iv_known, iv_fitted, vth, num_pts, atol, pts=None, plot_lines=Tru
 
         # plot point on known curve
         plt.plot(new_voltage, new_current, marker='o', color='magenta', markersize=3)
-        
+
         if plot_lines: # plot line intersecting curves
             xs = [0, min(vp, new_voltage), max(vp, new_voltage)]
             if xs[1] == vp:
@@ -637,9 +636,10 @@ def get_argparser():
     return parser
 
 
-######## 
+########
 # MAIN #
-######## 
+########
+
 
 if __name__ == '__main__':
     args = get_argparser().parse_args()
@@ -672,4 +672,3 @@ if __name__ == '__main__':
 
     write_test_set_score_per_curve_csvs(scores, args.csv_output_path)
     write_overall_scores_csv(scores, args.csv_output_path)
-

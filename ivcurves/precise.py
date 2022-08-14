@@ -1,4 +1,4 @@
-import pvlib 
+import pvlib
 import numpy as np
 import matplotlib.pyplot as plt
 from utils import mp
@@ -9,7 +9,7 @@ import json
 
 
 ###################
-# Max power point # 
+# Max power point #
 ###################
 
 
@@ -41,7 +41,7 @@ def max_power_pt_finder(il, io, rs, rsh, n, vth, ns, atol):
         The thermal voltage of the cell (in volts) may be calculated as
         :math:`k_B T_c / q`, where :math:`k_B` is Boltzmann's constant (J/K),
         :math:`T_c` is the temperature of the p-n junction in Kelvin, and
-        :math:`q` is the charge of an electron (coulombs). 
+        :math:`q` is the charge of an electron (coulombs).
 
     ns : numeric
         Number of cells in series :math:`N_s`
@@ -61,7 +61,7 @@ def max_power_pt_finder(il, io, rs, rsh, n, vth, ns, atol):
 
     # function we want to maximize
     # x represents voltage
-    power_func = lambda x : x * lambert_i_from_v(x, il, io, rs, rsh, n, vth, ns) 
+    power_func = lambda x : x * lambert_i_from_v(x, il, io, rs, rsh, n, vth, ns)
 
     # find initial interval endpts (using (0, I_sc) and (V_oc, 0) as starting
     # endpts, power=0 at both these points)
@@ -72,7 +72,7 @@ def max_power_pt_finder(il, io, rs, rsh, n, vth, ns, atol):
     # run golden search on power function with above starting interval
     if (xr - xl) < atol: # this will cause problems when defining iterlimit
         # means xr == xl (roughly)
-        # shouldn't happen unless both xr and xl are basically zero 
+        # shouldn't happen unless both xr and xl are basically zero
         assert (mp.chop(xr) == 0 and mp.chop(xl) == 0)
         # this should only ever happen for very extreme parameters
         return 0, 0, 0
@@ -96,7 +96,7 @@ def max_power_pt_finder(il, io, rs, rsh, n, vth, ns, atol):
 
 
 ########################
-# Golden search method # 
+# Golden search method #
 ########################
 
 
@@ -116,7 +116,7 @@ def golden_search(l_endpt, r_endpt, func, atol, iterlimit, int_pt=tuple(), is_ri
     func : function
         Function we want to maximize (single-variable).
 
-    atol : float 
+    atol : float
         The x-coordinate of the returned point will be at most ``atol`` from the
         x-coordinate that produces the true maximum in the given interval.
 
@@ -164,7 +164,7 @@ def golden_search(l_endpt, r_endpt, func, atol, iterlimit, int_pt=tuple(), is_ri
 
     # find left and right interior points
     if int_pt == tuple(): # first iteration, no interior points yet
-        l_int_pt = get_left_int_pt(xl, xr, func) 
+        l_int_pt = get_left_int_pt(xl, xr, func)
         r_int_pt = get_right_int_pt(xl, xr, func)
     else: # already have one interior point
         if is_right_int_pt:
@@ -180,14 +180,14 @@ def golden_search(l_endpt, r_endpt, func, atol, iterlimit, int_pt=tuple(), is_ri
         if error < atol:
             return l_int_pt
         else:
-            return golden_search(l_endpt, r_int_pt, func, atol, iterlimit, l_int_pt, is_right_int_pt=True, num_iter=num_iter+1) 
+            return golden_search(l_endpt, r_int_pt, func, atol, iterlimit, l_int_pt, is_right_int_pt=True, num_iter=num_iter+1)
             # `is_right_int_pt`=True because l_int_pt is now the right_int_pt of new interval
     else:
         error = abs(r_endpt[0] - l_int_pt[0])
         if error < atol:
             return r_int_pt
         else:
-            return golden_search(l_int_pt, r_endpt, func, atol, iterlimit, r_int_pt, is_right_int_pt=False, num_iter=num_iter+1) 
+            return golden_search(l_int_pt, r_endpt, func, atol, iterlimit, r_int_pt, is_right_int_pt=False, num_iter=num_iter+1)
             # `is_right_int_pt`=False because r_int_pt is now the left_int_pt of new interval
 
 
@@ -224,7 +224,7 @@ def get_left_int_pt(left_x_endpt, right_x_endpt, func):
 
 def get_right_int_pt(left_x_endpt, right_x_endpt, func):
     r"""
-    Calculates the right interior point of the interval. 
+    Calculates the right interior point of the interval.
 
     This is an auxiliary function for :func:`golden_search`.
 
@@ -245,7 +245,7 @@ def get_right_int_pt(left_x_endpt, right_x_endpt, func):
         Coordinate for right interior point.
     """
     xl, xr = left_x_endpt, right_x_endpt
-    rho = (1/2) * (3 - mp.sqrt(5)) 
+    rho = (1/2) * (3 - mp.sqrt(5))
     # this value for rho is equivalent to using golden ratio
 
     r_int_x = xl + (1 - rho)*(xr - xl) # voltage
@@ -291,7 +291,7 @@ def lambert_i_from_v(v, il, io, rs, rsh, n, vth, ns):
         The thermal voltage of the cell (in volts) may be calculated as
         :math:`k_B T_c / q`, where :math:`k_B` is Boltzmann's constant (J/K),
         :math:`T_c` is the temperature of the p-n junction in Kelvin, and
-        :math:`q` is the charge of an electron (coulombs). 
+        :math:`q` is the charge of an electron (coulombs).
 
     ns : numeric
         Number of cells in series :math:`N_s`
@@ -349,7 +349,7 @@ def lambert_v_from_i(i, il, io, rs, rsh, n, vth, ns):
         The thermal voltage of the cell (in volts) may be calculated as
         :math:`k_B T_c / q`, where :math:`k_B` is Boltzmann's constant (J/K),
         :math:`T_c` is the temperature of the p-n junction in Kelvin, and
-        :math:`q` is the charge of an electron (coulombs). 
+        :math:`q` is the charge of an electron (coulombs).
 
     ns : numeric
         Number of cells in series :math:`N_s`
@@ -410,7 +410,7 @@ def diff_lhs_rhs(v, i, il, io, rs, rsh, n, vth, ns):
         The thermal voltage of the cell (in volts) may be calculated as
         :math:`k_B T_c / q`, where :math:`k_B` is Boltzmann's constant (J/K),
         :math:`T_c` is the temperature of the p-n junction in Kelvin, and
-        :math:`q` is the charge of an electron (coulombs). 
+        :math:`q` is the charge of an electron (coulombs).
 
     ns : numeric
         Number of cells in series :math:`N_s`
@@ -453,7 +453,7 @@ def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
         The thermal voltage of the cell (in volts) may be calculated as
         :math:`k_B T_c / q`, where :math:`k_B` is Boltzmann's constant (J/K),
         :math:`T_c` is the temperature of the p-n junction in Kelvin, and
-        :math:`q` is the charge of an electron (coulombs). 
+        :math:`q` is the charge of an electron (coulombs).
 
     ns : numeric
         Number of cells in series :math:`N_s`
@@ -466,7 +466,7 @@ def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
         rarely exact solutions to this equation. Here, an error of at most
         ``atol`` means that for a given :math:`(V, I)` pair,
 
-        .. math:: 
+        .. math::
 
            \left|
               I_L - I_0 \left[
@@ -502,7 +502,7 @@ def get_precise_i(il, io, rs, rsh, n, vth, ns, atol, num_pts):
     i_precise_enough = lambda c: abs(diff_lhs_rhs(v, c, il, io, rs, rsh, n, vth, ns)) < atol
     for idx, (v, i) in enumerate(zip(vv, ii)):
         # check if i val already precise enough
-        if i_precise_enough(i): 
+        if i_precise_enough(i):
             new_i = i
         else:
             new_i = lambert_i_from_v(v, il, io, rs, rsh, n, vth, ns)
@@ -618,9 +618,7 @@ def write_test_set_json(test_set_filename, case_parameter_sets, vth, temp_cell,
         v_mp, i_mp, p_mp = max_power_pt_finder(il, io, rs, rsh, n,
                                                vth, ns, atol)
 
-        all_mpf = itertools.chain(vv, ii, [v_oc, i_sc, v_mp, i_mp, p_mp])
         nstr = utils.mp_nstr_precision_func
-
         vv_str_list = [nstr(x) for x in vv]
         ii_str_list = [nstr(x) for x in ii]
         case_test_suite['IV Curves'].append({
@@ -628,6 +626,7 @@ def write_test_set_json(test_set_filename, case_parameter_sets, vth, temp_cell,
             'Currents': ii_str_list, 'v_oc': nstr(v_oc),
             'i_sc': nstr(i_sc), 'v_mp': nstr(v_mp),
             'i_mp': nstr(i_mp), 'p_mp': nstr(p_mp),
+            'cells_in_series': str(int(ns)),
             'Temperature': mp.nstr(temp_cell, n=5), 'Irradiance': None,
             'Sweep direction': None, 'Datetime': None
         })
@@ -657,7 +656,7 @@ if __name__ == '__main__':
     args = get_argparser().parse_args()
 
     if args.test_set_filename:
-        test_set_filenames = [test_set_filename]
+        test_set_filenames = [args.test_set_filename]
     else:
         test_set_filenames = utils.get_filenames_in_directory(utils.TEST_SETS_DIR)
 

@@ -34,10 +34,10 @@ def constants():
     precision = 16
     atol = mp.mpmathify(1e-16)
 
-    # Boltzmann's const (J/K), electron charge (C), temp (K) 
+    # Boltzmann's const (J/K), electron charge (C), temp (K)
     k, q, temp_cell = map(mp.mpmathify, [1.380649e-23, 1.60217663e-19, 298.15])
     vth = (k * temp_cell) / q
-    
+
     return {'k': k, 'q': q, 'temp_cell': temp_cell, 'vth': vth, 'atol': atol,
             'precision': precision, 'num_pts': num_pts}
 
