@@ -135,8 +135,8 @@ jobs:
             # read pr_config.json into environment variables
             env_vars=($(python3 .github/workflows/utils/print_json_as_env.py "$submissions_folder"/pr_config.json --validate-pr-config --split-path-variables --quote-path-variables | tr '\n' ' '))
             for var in ${env_vars[@]}; do
-              echo "$var"
-              export "$var"
+              echo $var
+              export $var
             done
 
             if ! $RUN_SCORER; then
