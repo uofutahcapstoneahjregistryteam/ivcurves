@@ -47,7 +47,7 @@ jobs:
       PR_NUMBER: ${{ matrix.pr-data[0] }}
       PR_USERNAME: ${{ matrix.pr-data[1] }}
     steps:
-      - name: Checkout base main
+      - name: Checkout base main (with entire commit history)
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -135,8 +135,8 @@ jobs:
             # read pr_config.json into environment variables
             env_vars=($(python3 .github/workflows/utils/print_json_as_env.py "$submissions_folder"/pr_config.json --validate-pr-config --split-path-variables | xargs))
             for var in ${env_vars[@]}; do
-              echo $var
-              export $var
+              echo "$var"
+              export "$var"
             done
 
             if ! $RUN_SCORER; then
@@ -179,4 +179,9 @@ jobs:
           git add docs/sphinx/source/scores_database.json
           git commit -m 'Update all entries in scores database'
           git push origin main
+
+  build-sphinx-docs:
+    needs:
+      - score-all-submissions
+    uses: ./.github/workflows/build-sphinx-docs.yaml
 
