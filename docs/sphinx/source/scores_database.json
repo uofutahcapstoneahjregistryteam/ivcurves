@@ -33,6 +33,7 @@
       "case1": "438.2491416282271253",
       "case2": "436.6555645081116309",
       "case3": "436.6555645081116309"
-    }
+    },
+    "broken": "Missing scores from these test sets: case2, case3, case1"
   }
 }
