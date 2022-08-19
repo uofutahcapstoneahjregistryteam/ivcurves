@@ -94,8 +94,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: submissions
-      - name: debug
-        run: ls -R submissions
       - name: Run all submissions
         run: |
           #               PR_DATA
@@ -144,7 +142,6 @@ jobs:
             IFS=$_IFS
 
             for var in "${env_vars[@]}"; do
-              echo "$var"
               export "$var"
             done
 
@@ -152,7 +149,7 @@ jobs:
               continue
             fi
 
-            # set up virtual environment
+            # set up Python virtual environment
             # --system-site-packages exposes system packages (ivcurves requirements)
             python3 -m venv --system-site-packages "$submissions_folder"/env
             source "$submissions_folder"/env/bin/activate
@@ -166,16 +163,14 @@ jobs:
             # run submission (may fail)
             submission_exit_code=$(python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME"; echo $?)
 
-            # score submission (will fail if no output from submission)
+            # score submission (will fail if no CSV output from the submission)
             scorer_exit_code=$(python3 "$repo_base"/ivcurves/compare_curves.py . --csv-output-path .; echo $?)
-
-            ls
 
             cd "$repo_base"
 
             exit_code=$submission_exit_code || $scorer_exit_code
 
-            # record updated entry in database
+            # validate and record updated scores in database
             python3 .github/workflows/utils/record_scores.py --broken-if-invalid --pr-author ${pr_usernames[i]} --pr-number ${pr_numbers[i]} --pr-closed-at ${pr_datetimes[i]} --overall-scores-path "$submissions_folder"/overall_scores.csv --database-path docs/sphinx/source/scores_database.json
 
             # deactivate and remove virtual environment
