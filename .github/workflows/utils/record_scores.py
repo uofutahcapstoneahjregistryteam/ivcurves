@@ -25,6 +25,8 @@ def load_overall_scores(filename):
     to strings represented scores by reading from a CSV file with these
     columns: test_set, and score.
 
+    Returns an empty dictionary if a FileNotFoundError is raised.
+
     Parameters
     ----------
     filename : str
@@ -33,13 +35,18 @@ def load_overall_scores(filename):
     Returns
     -------
     dict
+        A dictionary and an empty string.
+        If a FileNotFoundError was raised, an empty dictionary is returned.
     """
     overall_scores = {}
-    with open(filename, newline='') as file:
-        reader = csv.DictReader(file)
-        for row in reader:
-            overall_scores[row['test_set']] = row['score']
-    return overall_scores
+    try:
+        with open(filename, newline='') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                overall_scores[row['test_set']] = row['score']
+        return overall_scores
+    except FileNotFoundError:
+        return {}
 
 
 def test_set_filenames():
