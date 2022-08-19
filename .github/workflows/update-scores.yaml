@@ -133,7 +133,16 @@ jobs:
             submissions_folder=submissions/${pr_numbers[i]}--${pr_usernames[i]}
 
             # read pr_config.json into environment variables
-            env_vars=($(python3 .github/workflows/utils/print_json_as_env.py "$submissions_folder"/pr_config.json --validate-pr-config --split-path-variables | tr '\n' ' '))
+            # Note: Bash's internal variable IFS is changed from ' ' (space) to '\n' newline.
+            # This causes the output of print_json_as_env to be split by '\n' instead of ' '.
+            # IFS is restored (with _IFS) after env_vars is created.
+            _IFS=$IFS
+            IFS=$'\n'
+
+            env_vars=($(python3 .github/workflows/utils/print_json_as_env.py "$submissions_folder"/pr_config.json --validate-pr-config --split-path-variables))
+
+            IFS=$_IFS
+
             for var in ${env_vars[@]}; do
               echo "$var"
               export "$var"
