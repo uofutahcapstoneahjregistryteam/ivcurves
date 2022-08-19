@@ -1,5 +1,5 @@
 {
     "RUN_SCORER": true,
-    "REQUIREMENTS": "works with spaces/test/req uirements.txt",
-    "SUBMISSION_MAIN": "works with spaces/test/so lution.py"
+    "REQUIREMENTS": "requirements.txt",
+    "SUBMISSION_MAIN": "solution_crashes.py"
 }
