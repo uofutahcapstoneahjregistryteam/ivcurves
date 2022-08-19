@@ -143,7 +143,7 @@ jobs:
 
             IFS=$_IFS
 
-            for var in ${env_vars[@]}; do
+            for var in "${env_vars[@]}"; do
               echo "$var"
               export "$var"
             done
