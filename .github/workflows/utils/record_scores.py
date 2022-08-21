@@ -91,7 +91,9 @@ def validate_overall_scores(overall_scores):
     missing_test_set_filenames = valid_test_set_filenames - overall_scores_keys
 
     if missing_test_set_filenames:
-        return False, f'Missing scores from these test sets: {", ".join(missing_test_set_filenames)}'
+        names_list = list(missing_test_set_filenames)
+        names_list.sort() # sort to keep same order in error message
+        return False, f'Missing scores from these test sets: {", ".join(names_list)}'
 
     for name, score_str in overall_scores.items():
         try:

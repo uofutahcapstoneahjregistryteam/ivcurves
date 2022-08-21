@@ -27,6 +27,9 @@ jobs:
               database = json.load(file)
           pr_data = []
           for pr_number, data in database.items():
+              # exclude submissions already marked broken
+              if 'broken' in data.keys():
+                  continue
               pair = [pr_number, data['username'], data['submission_datetime']]
               pr_data.append(pair)
           print(pr_data)
@@ -61,7 +64,8 @@ jobs:
         run: git checkout ${{ env.MERGE_SHA }}
       - name: Rename submission folder
         working-directory: submissions
-        # '--' is not allowed in GitHub usernames
+        # '--' is not allowed in GitHub usernames, so it is used to
+        # concatenate the pull request number and username.
         run: cp -r ${{ env.PR_USERNAME }} ${{ env.PR_NUMBER}}--${{ env.PR_USERNAME }}
       - name: Upload renamed submission folder
         uses: actions/upload-artifact@v3
@@ -101,8 +105,8 @@ jobs:
           # ----------|-------------|------------
           #     #     |     str     |   <date>
           #
-          # fromJson turns env.PR_DATA into a 2-d array like above.
-          # Next, the index [*][0] selects the first column.
+          # fromJson turns env.PR_DATA into a 2-d array as above.
+          # Next, the index [*][0] selects the first column of the 2-d array.
           # toJson pretty-prints the first column into this string:
           # [
           #   "#1",
@@ -111,7 +115,7 @@ jobs:
           # ]
           # This string is piped into tr -d '[",\n]' which deletes all square
           # brackets, double quotes, commans, and newline characters from the
-          # pretty-printed string above. This results in the following string:
+          # pretty-printed string. This results in the following string:
           # '#1 #2 ...'
           # Wrapping this string (of space-seperated values) in parentheses
           # gives a bash array of pull request numbers.
@@ -149,12 +153,13 @@ jobs:
               continue
             fi
 
-            # set up Python virtual environment
+            # set up a Python virtual environment
             # --system-site-packages exposes system packages (ivcurves requirements)
             python3 -m venv --system-site-packages "$submissions_folder"/env
             source "$submissions_folder"/env/bin/activate
 
-            # install submission requirements and run submission in its directory
+            # install submission requirements and run the submission in
+            # its directory
             cd "$submissions_folder"
 
             # install submission requirements
@@ -177,7 +182,8 @@ jobs:
             deactivate
             rm -r "$submissions_folder"/env
           done
-
+      - name: Commit and push scores database
+        run: |
           git config user.name 'GitHub'
           git config user.email 'github@ivcurves'
           git add docs/sphinx/source/scores_database.json
@@ -185,6 +191,7 @@ jobs:
           git push origin main
 
   build-sphinx-docs:
+    # rebuild docs to update leaderboard
     needs:
       - score-all-submissions
     uses: ./.github/workflows/build-sphinx-docs.yaml
