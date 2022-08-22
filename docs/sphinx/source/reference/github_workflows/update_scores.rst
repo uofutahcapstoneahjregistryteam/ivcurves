@@ -4,7 +4,7 @@ Update Scores
 .. mermaid::
 
    flowchart
-   MaintainerCallsWorkflow(A Maintainer runs this workflow using workflow_dispatch) --> StartWorkflow(GitHub begins running this workflow)
+   MaintainerCallsWorkflow(An ivcurves maintainer requests to update all submission scores) --> StartWorkflow(GitHub begins running this workflow)
 
    StartWorkflow --> StartGetPRDataJob(GitHub begins the get-pr-data job)
    StartGetPRDataJob --> CheckoutGetPRData(Checkout ivcurves' main branch)

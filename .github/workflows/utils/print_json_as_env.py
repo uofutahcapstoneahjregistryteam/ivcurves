@@ -164,7 +164,7 @@ def get_argparser():
     parser.add_argument('--split-path-variables', action=argparse.BooleanOptionalAction,
                         help='Adds two additional variables when a path variable P is encountered: a parent directory variable (P_PATH), and a filename variable (P_FILENAME).')
     parser.add_argument('--quote-path-variables', action=argparse.BooleanOptionalAction,
-                        help='Wrap path variables in double quotes (")')
+                        help='Wrap path variables in double quotes (").')
     return parser
 
 

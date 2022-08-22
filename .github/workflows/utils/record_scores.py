@@ -171,7 +171,7 @@ def mark_submission_broken(database, pr_number, validation_msg):
 def get_argparser():
     parser = argparse.ArgumentParser()
     parser.add_argument('--broken-if-invalid', action=argparse.BooleanOptionalAction,
-                        help='Mark submission broken instead of raising an exception')
+                        help='Mark submission broken instead of raising an exception.')
     parser.add_argument('--pr-author', dest='pr_author', type=str,
                         help='GitHub username of the pull request author.')
     parser.add_argument('--pr-number', dest='pr_number', type=int,
