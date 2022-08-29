@@ -170,8 +170,6 @@ def mark_submission_broken(database, pr_number, validation_msg):
 
 def get_argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--broken-if-invalid', action=argparse.BooleanOptionalAction,
-                        help='Mark submission broken instead of raising an exception.')
     parser.add_argument('--pr-author', dest='pr_author', type=str,
                         help='GitHub username of the pull request author.')
     parser.add_argument('--pr-number', dest='pr_number', type=int,
@@ -182,6 +180,11 @@ def get_argparser():
                         type=str, help='Path to the CSV of overall scores.')
     parser.add_argument('--database-path', dest='database_path', type=str,
                         help='Path to the JSON scores database.')
+    parser.add_argument('--broken-if-invalid', action=argparse.BooleanOptionalAction,
+                        default=False,
+                        help='Mark submission broken instead of raising an exception.')
+    parser.add_argument('--save-database', action=argparse.BooleanOptionalAction,
+                        default=True, help='Save updates to the database.')
     return parser
 
 
@@ -199,5 +202,6 @@ if __name__ == '__main__':
     else:
         raise ValueError(validation_msg)
 
-    save_json(database, f'{ROOT_DIR}/{args.database_path}')
+    if args.save_database:
+        save_json(database, f'{ROOT_DIR}/{args.database_path}')
 
