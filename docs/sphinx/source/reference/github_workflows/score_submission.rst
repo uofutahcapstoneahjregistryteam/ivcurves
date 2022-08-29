@@ -1,11 +1,11 @@
-Score Submission Workflow
-=========================
+Score Submission
+================
 
 .. mermaid:: 
 
    flowchart
    Push(A commit is pushed)
-   PullRequest(A pull Request is opened, synchronized, or closed)
+   PullRequest(A pull request is opened, synchronized, or closed)
 
    Push --> StartWorkflow(GitHub begins running this workflow)
    PullRequest --> StartWorkflow

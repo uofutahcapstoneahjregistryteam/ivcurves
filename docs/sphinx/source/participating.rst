@@ -183,15 +183,15 @@ The ivcurves documentation uses numpy-sytle docstrings.
          :toctree: generated/
 
          ..
-            write the name of each function in <your_py_filename>.py
+            Write the name of each function in <your_py_filename>.py.
 
          <function_name1>
          <function_name2>
 
    ..
-      note to documentation writer: the rst in the code-block above
+      Note to the documentation writer: the rst in the code-block above
       is still interpreted by Sphinx. To prevent autosummary from executing,
-      it must be substituted in (using sphinx_substitution_extensions)
+      it must be substituted in (using sphinx_substitution_extensions).
 
 #. The following steps are for registering your submission's ``.py`` files that are in subfolders under ``submissions/<your_GitHub_username>``.
 
@@ -208,8 +208,8 @@ The ivcurves documentation uses numpy-sytle docstrings.
             :maxdepth: 2
 
             ..
-               write the name of each .rst file you created here
-               the .rst extension should be ommitted
+               Write the name of each .rst file you created here.
+               The .rst extension should be ommitted.
 
             <your_py_filename1>
             <your_py_filename2>
@@ -225,19 +225,21 @@ The ivcurves documentation uses numpy-sytle docstrings.
          :maxdepth: 2
 
          ..
-            write the name of each .rst file you created for your .py files in the top level of ``submissions/<your_GitHub_username>``
-            the .rst extension should be ommitted
+            Write the name of each .rst file you created for your .py files in
+            the top level of ``submissions/<your_GitHub_username>``.
+            The .rst extension should be ommitted.
 
          <your_py_filename1>
          <your_py_filename2>
 
          ..
-            for each subfolder in ``submissions/<your_GitHub_username>``, write the following lines
+            For each subfolder in ``submissions/<your_GitHub_username>``, write
+            the following lines:
 
          <your_subfolder_name1>/index
          <your_subfolder_name2>/index
 
-#. If your submission had a folder structure like this
+#. Suppose your submission has a folder structure like this:
 
    .. code-block:: bash
 
@@ -248,7 +250,7 @@ The ivcurves documentation uses numpy-sytle docstrings.
           |- <your_subfolder_name1>/
                |- <your_py_filename1>.py
 
-   then after following the previous steps you should have this folder structure:
+   After following the previous steps, your submission's documentation should have a folder structure like this:
 
    .. code-block:: bash
 

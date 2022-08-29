@@ -27,6 +27,10 @@ def leaderboard_entry_list():
     leaderboard_entries = []
 
     for pr_number, submission_data in database.items():
+        # exclude broken submissions from the leaderboard
+        if 'broken' in submission_data.keys():
+            continue
+
         leaderboard_entries.append({
             'pr_number': to_pull(pr_number),
             'username': to_ghuser(submission_data['username']),

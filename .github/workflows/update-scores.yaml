@@ -27,6 +27,9 @@ jobs:
               database = json.load(file)
           pr_data = []
           for pr_number, data in database.items():
+              # exclude submissions already marked broken
+              if 'broken' in data.keys():
+                  continue
               pair = [pr_number, data['username'], data['submission_datetime']]
               pr_data.append(pair)
           print(pr_data)
@@ -47,7 +50,7 @@ jobs:
       PR_NUMBER: ${{ matrix.pr-data[0] }}
       PR_USERNAME: ${{ matrix.pr-data[1] }}
     steps:
-      - name: Checkout base main
+      - name: Checkout base main (with entire commit history)
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
@@ -61,7 +64,8 @@ jobs:
         run: git checkout ${{ env.MERGE_SHA }}
       - name: Rename submission folder
         working-directory: submissions
-        # '--' is not allowed in GitHub usernames
+        # '--' is not allowed in GitHub usernames, so it is used to
+        # concatenate the pull request number and username.
         run: cp -r ${{ env.PR_USERNAME }} ${{ env.PR_NUMBER}}--${{ env.PR_USERNAME }}
       - name: Upload renamed submission folder
         uses: actions/upload-artifact@v3
@@ -94,17 +98,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: submissions
-      - name: debug
-        run: ls -R submissions
       - name: Run all submissions
+        env:
+          SUBMISSION_TIMEOUT: 2 # seconds
         run: |
           #               PR_DATA
           # pr_number | pr_username | pr_datetime
           # ----------|-------------|------------
           #     #     |     str     |   <date>
           #
-          # fromJson turns env.PR_DATA into a 2-d array like above.
-          # Next, the index [*][0] selects the first column.
+          # fromJson turns env.PR_DATA into a 2-d array as above.
+          # Next, the index [*][0] selects the first column of the 2-d array.
           # toJson pretty-prints the first column into this string:
           # [
           #   "#1",
@@ -113,7 +117,7 @@ jobs:
           # ]
           # This string is piped into tr -d '[",\n]' which deletes all square
           # brackets, double quotes, commans, and newline characters from the
-          # pretty-printed string above. This results in the following string:
+          # pretty-printed string. This results in the following string:
           # '#1 #2 ...'
           # Wrapping this string (of space-seperated values) in parentheses
           # gives a bash array of pull request numbers.
@@ -133,50 +137,64 @@ jobs:
             submissions_folder=submissions/${pr_numbers[i]}--${pr_usernames[i]}
 
             # read pr_config.json into environment variables
-            env_vars=($(python3 .github/workflows/utils/print_json_as_env.py "$submissions_folder"/pr_config.json --validate-pr-config --split-path-variables | xargs))
-            for var in ${env_vars[@]}; do
-              echo $var
-              export $var
+            # Note: Bash's internal variable IFS is changed from ' ' (space) to '\n' newline.
+            # This causes the output of print_json_as_env to be split by '\n' instead of ' '.
+            # IFS is restored (with _IFS) after env_vars is created.
+            _IFS=$IFS
+            IFS=$'\n'
+
+            env_vars=($(python3 .github/workflows/utils/print_json_as_env.py "$submissions_folder"/pr_config.json --validate-pr-config --split-path-variables))
+
+            IFS=$_IFS
+
+            for var in "${env_vars[@]}"; do
+              export "$var"
             done
 
             if ! $RUN_SCORER; then
               continue
             fi
 
-            # set up virtual environment
+            # set up a Python virtual environment
             # --system-site-packages exposes system packages (ivcurves requirements)
             python3 -m venv --system-site-packages "$submissions_folder"/env
             source "$submissions_folder"/env/bin/activate
 
-            # install submission requirements and run submission in its directory
+            # install submission requirements and run the submission in
+            # its directory
             cd "$submissions_folder"
 
             # install submission requirements
             pip3 install -r "$REQUIREMENTS_PATH"/"$REQUIREMENTS_FILENAME"
 
             # run submission (may fail)
-            submission_exit_code=$(python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME"; echo $?)
+            submission_exit_code=$(python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME" &; SUBMISSION_PID=$!; sleep $SUBMISSION_TIMEOUT; kill -9 $SUBMISSION_PID; echo $?)
 
-            # score submission
-            python3 "$repo_base"/ivcurves/compare_curves.py . --csv-output-path .
-
-            ls
+            # score submission (will fail if no CSV output from the submission)
+            scorer_exit_code=$(python3 "$repo_base"/ivcurves/compare_curves.py . --csv-output-path .; echo $?)
 
             cd "$repo_base"
 
             exit_code=$submission_exit_code || $scorer_exit_code
 
-            # record updated entry in database
+            # validate and record updated scores in database
             python3 .github/workflows/utils/record_scores.py --broken-if-invalid --pr-author ${pr_usernames[i]} --pr-number ${pr_numbers[i]} --pr-closed-at ${pr_datetimes[i]} --overall-scores-path "$submissions_folder"/overall_scores.csv --database-path docs/sphinx/source/scores_database.json
 
             # deactivate and remove virtual environment
             deactivate
             rm -r "$submissions_folder"/env
           done
-
+      - name: Commit and push scores database
+        run: |
           git config user.name 'GitHub'
           git config user.email 'github@ivcurves'
           git add docs/sphinx/source/scores_database.json
           git commit -m 'Update all entries in scores database'
           git push origin main
+
+  build-sphinx-docs:
+    # rebuild docs to update leaderboard
+    needs:
+      - score-all-submissions
+    uses: ./.github/workflows/build-sphinx-docs.yaml
 
