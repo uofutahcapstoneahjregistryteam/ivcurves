@@ -188,11 +188,15 @@ def get_argparser():
     return parser
 
 
-if __name__ == '__main__':
+def record_scores():
     args = get_argparser().parse_args()
 
     overall_scores = load_overall_scores(args.overall_scores_path)
     has_valid_scores, validation_msg = validate_overall_scores(overall_scores)
+
+    if not args.save_database:
+        return
+
     database = load_json(args.database_path)
 
     if has_valid_scores:
@@ -202,6 +206,9 @@ if __name__ == '__main__':
     else:
         raise ValueError(validation_msg)
 
-    if args.save_database:
-        save_json(database, f'{ROOT_DIR}/{args.database_path}')
+    save_json(database, f'{ROOT_DIR}/{args.database_path}')
+
+
+if __name__ == '__main__':
+    record_scores():
 
