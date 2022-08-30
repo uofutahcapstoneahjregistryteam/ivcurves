@@ -90,6 +90,8 @@ jobs:
         run: timeout -k 1s ${{ env.SUBMISSION_TIMEOUT }}m python3 "${{ env.SUBMISSION_MAIN_FILENAME }}"
       - name: Run scorer
         working-directory: submissions/${{ env.CONTRIBUTOR }}
+        # will fail if no CSV output from the submission,
+        # or its CSV files contain very inaccurate results (no intersection between the true and fitted curves can be found)
         run: python3 ../../ivcurves/compare_curves.py "${{ env.SUBMISSION_MAIN_PATH}}" --csv-output-path .
       - name: Validate scores
         run: python3 .github/workflows/utils/record_scores.py
