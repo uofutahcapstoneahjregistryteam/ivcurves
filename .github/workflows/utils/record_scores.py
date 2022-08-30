@@ -210,5 +210,5 @@ def record_scores():
 
 
 if __name__ == '__main__':
-    record_scores():
+    record_scores()
 
