@@ -84,12 +84,10 @@ jobs:
       - name: Run submission
         working-directory: submissions/${{ env.CONTRIBUTOR }}/${{ env.SUBMISSION_MAIN_PATH }}
         env:
-          SUBMISSION_TIMEOUT: 2 # seconds
-        run: |
-          python3 "${{ env.SUBMISSION_MAIN_FILENAME }}" &
-          SUBMISSION_PID=$!
-          sleep $SUBMISSION_TIMEOUT
-          kill -9 $SUBMISSION_PID
+          SUBMISSION_TIMEOUT: 0.2 # minutes
+        # timeout sends a SIGINT after SUBMISSION_TIMEOUT minutes.
+        # if the submission is still running after SIGINT, SIGKILL is sent the next second.
+        run: timeout -k 1s ${{ env.SUBMISSION_TIMEOUT }}m python3 "${{ env.SUBMISSION_MAIN_FILENAME }}"
       - name: Run scorer
         working-directory: submissions/${{ env.CONTRIBUTOR }}
         run: python3 ../../ivcurves/compare_curves.py "${{ env.SUBMISSION_MAIN_PATH}}" --csv-output-path .
