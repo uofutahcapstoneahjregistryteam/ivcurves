@@ -7,7 +7,7 @@ def solution():
     r"""
     This is a test solution.
     """
-    parameters = 0.5 + np.zeros((32, 6))
+    parameters = 4_000_000 + np.zeros((32, 6))
     header = 'Index,photocurrent,saturation_current,resistance_series,resistance_shunt,n,cells_in_series'.split(',')
 
     for name in ['case1.csv', 'case2.csv', 'case3.csv']:
