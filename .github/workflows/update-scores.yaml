@@ -170,7 +170,7 @@ jobs:
             # run submission (may fail)
             # timeout sends a SIGINT after SUBMISSION_TIMEOUT minutes.
             # if the submission is still running after SIGINT, SIGKILL is sent the next second.
-            submission_exit_code=$(timeout -k 1s ${{ env.SUBMISSION_TIMEOUT }}m python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME")
+            submission_exit_code=$(timeout -k 1s ${{ env.SUBMISSION_TIMEOUT }}m python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME"; echo $?)
 
             # score submission (will fail if no CSV output from the submission)
             scorer_exit_code=$(python3 "$repo_base"/ivcurves/compare_curves.py . --csv-output-path .; echo $?)
