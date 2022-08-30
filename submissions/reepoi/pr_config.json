@@ -1,5 +1,5 @@
 {
     "RUN_SCORER": true,
     "REQUIREMENTS": "requirements.txt",
-    "SUBMISSION_MAIN": "solution_crashes.py"
+    "SUBMISSION_MAIN": "solution_timeout.py"
 }
