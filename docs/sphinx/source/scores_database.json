@@ -43,7 +43,8 @@
       "case1": "438.2491416282271253",
       "case2": "436.6555645081116309",
       "case3": "436.6555645081116309"
-    }
+    },
+    "broken": "Missing scores from these test sets: case1, case2, case3"
   },
   "86": {
     "username": "reepoi",
@@ -52,6 +53,7 @@
       "case1": "438.2491416282271253",
       "case2": "436.6555645081116309",
       "case3": "436.6555645081116309"
-    }
+    },
+    "broken": "Missing scores from these test sets: case1, case2, case3"
   }
 }
