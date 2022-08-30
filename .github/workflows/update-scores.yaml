@@ -168,7 +168,7 @@ jobs:
             pip3 install -r "$REQUIREMENTS_PATH"/"$REQUIREMENTS_FILENAME"
 
             # run submission (may fail)
-            submission_exit_code=$(python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME" &; SUBMISSION_PID=$!; sleep ${{ env.SUBMISSION_TIMEOUT }}; kill -9 $SUBMISSION_PID; echo $?)
+            submission_exit_code=$(python3 "$SUBMISSION_MAIN_PATH"/"$SUBMISSION_MAIN_FILENAME" & SUBMISSION_PID=$!; sleep ${{ env.SUBMISSION_TIMEOUT }}; kill -9 $SUBMISSION_PID; echo $?)
 
             # score submission (will fail if no CSV output from the submission)
             scorer_exit_code=$(python3 "$repo_base"/ivcurves/compare_curves.py . --csv-output-path .; echo $?)
