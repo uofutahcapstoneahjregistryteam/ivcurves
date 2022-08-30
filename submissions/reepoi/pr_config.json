@@ -1,5 +1,5 @@
 {
     "RUN_SCORER": true,
     "REQUIREMENTS": "requirements.txt",
-    "SUBMISSION_MAIN": "solution_timeout.py"
+    "SUBMISSION_MAIN": "solution_compare_curves_curves_too_far.py"
 }
